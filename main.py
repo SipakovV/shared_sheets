@@ -1,3 +1,3 @@
 import threading
 
-print('hello world')
+print('хрень какая-то')
