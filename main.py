@@ -1,4 +1,5 @@
 import threading
+import socket
 from time import sleep
 import csv
 import sys
@@ -52,6 +53,13 @@ def main():
 
     stop_thread = False
 
+    sock = socket.socket()
+
+    sock.bind(('', 9999))
+    sock.listen(1)
+    conn, addr = sock.accept()
+    print('connected:', addr)
+
     with open(filename, newline='') as f:
         reader = csv.reader(f)
         try:
@@ -62,6 +70,12 @@ def main():
             sys.exit('file {}, line {}: {}'.format(filename, reader.line_num, e))
 
     #print(data)
+
+    while True:
+        data = conn.recv(1024)
+        if not data:
+            break
+    conn.close()
 
 
 if __name__ == '__main__':
