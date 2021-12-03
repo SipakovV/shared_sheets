@@ -1,10 +1,14 @@
 import threading
+from time import sleep
 import csv
 import sys
 
 
 filename = 'data.csv'
 data = []
+
+stop_thread = False
+
 with open(filename, newline='') as f:
     reader = csv.reader(f)
     try:
