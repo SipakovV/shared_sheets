@@ -1,12 +1,30 @@
 # client.py
-
-from time import sleep
-import sys
-import tkinter as tk
 import socket
+import sys
+from threading import Thread
+import traceback
+import tkinter as tk
+from time import sleep
+
+from gui import App
+
+
+def gui_thread():
+    app = App()
+    app.master.title('1st window')
+    app.master.maxsize(1000, 400)
+    app.mainloop()
+    print('GUI thread ended!')
 
 
 def start_client():
+
+    try:
+        Thread(target=gui_thread).start()
+    except:
+        print("Terrible error!")
+        traceback.print_exc()
+
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     soc.connect(("127.0.0.1", 12345))
 

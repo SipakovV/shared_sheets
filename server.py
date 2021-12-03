@@ -7,6 +7,8 @@ import tkinter as tk
 from time import sleep
 import csv
 
+from gui import App
+
 
 FILENAME = 'data.csv'
 
@@ -94,7 +96,6 @@ def start_server():
             Thread(target=client_thread, args=(conn, ip, port)).start()
         except:
             print("Terrible error!")
-
             traceback.print_exc()
     soc.close()
 
