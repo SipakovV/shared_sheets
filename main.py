@@ -6,49 +6,73 @@ import tkinter as tk
 
 from gui import App
 
-'''
-class App(tk.Frame):
-    def __init__(self, master):
-        super().__init__(master)
-        self.pack()
 
-        self.entrythingy = tk.Entry()
-        self.entrythingy.pack()
+def child(tid):
+    myapp = App()
 
-        # Create the application variable.
-        self.contents = tk.StringVar()
-        # Set it to some value.
-        self.contents.set("this is a variable")
-        # Tell the entry widget to watch this variable.
-        self.entrythingy["textvariable"] = self.contents
+    #
+    # here are method calls to the window manager class
+    #
+    myapp.master.title(str(tid)+' window')
+    myapp.master.maxsize(1000, 400)
 
-        # Define a callback for when the user hits return.
-        # It prints the current value of the variable.
-        self.entrythingy.bind('<Key-Return>',
-                             self.print_contents)
+    # start the program
+    myapp.mainloop()
+    print('Hello from thread %d' % tid)
 
-    def print_contents(self, event):
-        print("Hi. The current entry content is:",
-              self.contents.get())
-'''
 
-root = tk.Tk()
-myapp = App(root)
-myapp.mainloop()
+def parent():
+    for i in range(2):
+        # создание дочернего потока
+        t = threading.Thread(target=child, args=(i+1,))
+        t.start()  # запуск дочернего потока
+        sleep(5)
+    print('Parent thread finished')
 
-filename = 'data.csv'
-data = []
 
-stop_thread = False
+def main():
 
-with open(filename, newline='') as f:
-    reader = csv.reader(f)
-    try:
-        for row in reader:
-            #print(row)
-            data.append(row)
-    except csv.Error as e:
-        sys.exit('file {}, line {}: {}'.format(filename, reader.line_num, e))
+    parent()
+    '''
+    myapp = App()
+    
+    #
+    # here are method calls to the window manager class
+    #
+    myapp.master.title('1st window')
+    myapp.master.maxsize(1000, 400)
 
-print(data)
+    # start the program
+    myapp.mainloop()
 
+    myapp1 = App()
+
+    #
+    # here are method calls to the window manager class
+    #
+    myapp1.master.title('2nd window')
+    myapp1.master.maxsize(1000, 400)
+
+    # start the program
+    myapp1.mainloop()
+    '''
+
+    filename = 'data.csv'
+    data = []
+
+    stop_thread = False
+
+    with open(filename, newline='') as f:
+        reader = csv.reader(f)
+        try:
+            for row in reader:
+                #print(row)
+                data.append(row)
+        except csv.Error as e:
+            sys.exit('file {}, line {}: {}'.format(filename, reader.line_num, e))
+
+    #print(data)
+
+
+if __name__ == '__main__':
+    main()
