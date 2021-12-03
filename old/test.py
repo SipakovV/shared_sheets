@@ -14,7 +14,7 @@ def child(tid):
     #
     # here are method calls to the window manager class
     #
-    myapp.master.title(str(tid)+' window')
+    myapp.master.title(str(tid) + ' window')
     myapp.master.maxsize(1000, 400)
 
     # start the program
@@ -25,19 +25,18 @@ def child(tid):
 def parent():
     for i in range(2):
         # создание дочернего потока
-        t = threading.Thread(target=child, args=(i+1,))
+        t = threading.Thread(target=child, args=(i + 1,))
         t.start()  # запуск дочернего потока
         sleep(5)
     print('Parent thread finished')
 
 
 def main():
-
-    #parent()
+    # parent()
 
     '''
     myapp = App()
-    
+
     #
     # here are method calls to the window manager class
     #
@@ -64,12 +63,12 @@ def main():
         reader = csv.reader(f)
         try:
             for row in reader:
-                #print(row)
+                # print(row)
                 data.append(row)
         except csv.Error as e:
             sys.exit('file {}, line {}: {}'.format(filename, reader.line_num, e))
 
-    #print(data)
+    # print(data)
 
     sock.listen(10)
     print('server started and listening')

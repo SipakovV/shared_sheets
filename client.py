@@ -1,39 +1,13 @@
-import threading
-from time import sleep
-import csv
-import sys
-import tkinter as tk
+# client.py
+
 import socket
 
-from gui import App
+soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+soc.connect(("127.0.0.1", 12345))
 
+clients_input = input("What you want to proceed my dear client?\n")
+soc.send(clients_input.encode("utf8"))  # we must encode the string to bytes
+result_bytes = soc.recv(4096)  # the number means how the response can be in bytes
+result_string = result_bytes.decode("utf8")  # the return will be in bytes, so decode
 
-def main():
-    '''
-    myapp = App()
-    
-    #
-    # here are method calls to the window manager class
-    #
-    myapp.master.title('1st window')
-    myapp.master.maxsize(1000, 400)
-
-    # start the program
-    myapp.mainloop()
-
-    data = []
-    print(data)
-    '''
-
-    sock = socket.socket()
-    sock.connect(('localhost', 8888))
-    sock.send(b'hello, world!')
-
-    data = sock.recv(1024)
-    sock.close()
-
-    print(data)
-
-
-if __name__ == '__main__':
-    main()
+print("Result from server is {}".format(result_string))

@@ -5,7 +5,7 @@ from threading import Thread
 import traceback
 
 
-def do_some_stuffs_with_input(input_string):  
+def do_some_stuffs_with_input(input_string):
     """
     This is where all the processing happens.
 
@@ -21,6 +21,7 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
     # the input is in bytes, so decode it
     input_from_client_bytes = conn.recv(MAX_BUFFER_SIZE)
 
+    print('Test')
     # MAX_BUFFER_SIZE is how big the message can be
     # this is test if it's sufficiently big
 
@@ -42,7 +43,6 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
 
 def start_server():
 
-
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # this is for easy starting/killing the app
     soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -55,14 +55,13 @@ def start_server():
         print('Bind failed. Error : ' + str(sys.exc_info()))
         sys.exit()
 
-    #Start listening on socket
-    soc.listen(10)
+    # Start listening on socket
+    soc.listen(5)
     print('Socket now listening')
 
     # for handling task in separate jobs we need threading
 
-
-    # this will make an infinite loop needed for 
+    # this will make an infinite loop needed for
     # not reseting server for every client
     while True:
         conn, addr = soc.accept()
