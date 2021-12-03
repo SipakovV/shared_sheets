@@ -3,9 +3,7 @@ import csv
 import sys
 import tkinter as tk
 
-from gui import App
 
-'''
 class App(tk.Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -29,22 +27,4 @@ class App(tk.Frame):
     def print_contents(self, event):
         print("Hi. The current entry content is:",
               self.contents.get())
-'''
-
-root = tk.Tk()
-myapp = App(root)
-myapp.mainloop()
-
-filename = 'data.csv'
-data = []
-with open(filename, newline='') as f:
-    reader = csv.reader(f)
-    try:
-        for row in reader:
-            #print(row)
-            data.append(row)
-    except csv.Error as e:
-        sys.exit('file {}, line {}: {}'.format(filename, reader.line_num, e))
-
-print(data)
 
