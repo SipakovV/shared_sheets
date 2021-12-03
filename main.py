@@ -32,7 +32,8 @@ def parent():
 
 def main():
 
-    parent()
+    #parent()
+
     '''
     myapp = App()
     
@@ -44,17 +45,6 @@ def main():
 
     # start the program
     myapp.mainloop()
-
-    myapp1 = App()
-
-    #
-    # here are method calls to the window manager class
-    #
-    myapp1.master.title('2nd window')
-    myapp1.master.maxsize(1000, 400)
-
-    # start the program
-    myapp1.mainloop()
     '''
 
     filename = 'data.csv'
