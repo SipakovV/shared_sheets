@@ -9,7 +9,7 @@ from gui import App
 
 
 def main():
-
+    '''
     myapp = App()
     
     #
@@ -23,10 +23,11 @@ def main():
 
     data = []
     print(data)
+    '''
 
     sock = socket.socket()
-    sock.connect(('localhost', 9999))
-    sock.send('hello, world!')
+    sock.connect(('localhost', 8888))
+    sock.send(b'hello, world!')
 
     data = sock.recv(1024)
     sock.close()

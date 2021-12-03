@@ -55,7 +55,7 @@ def main():
 
     sock = socket.socket()
 
-    sock.bind(('', 9999))
+    sock.bind(('', 8888))
     sock.listen(1)
     conn, addr = sock.accept()
     print('connected:', addr)
@@ -70,6 +70,11 @@ def main():
             sys.exit('file {}, line {}: {}'.format(filename, reader.line_num, e))
 
     #print(data)
+
+    sock.listen(10)
+    print('server started and listening')
+
+    conn.send('Welcome to the server. Type something and hit enter\n')  # send only takes string
 
     while True:
         data = conn.recv(1024)
