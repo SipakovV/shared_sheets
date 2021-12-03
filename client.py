@@ -3,6 +3,7 @@ from time import sleep
 import csv
 import sys
 import tkinter as tk
+import socket
 
 from gui import App
 
@@ -21,6 +22,15 @@ def main():
     myapp.mainloop()
 
     data = []
+    print(data)
+
+    sock = socket.socket()
+    sock.connect(('localhost', 9999))
+    sock.send('hello, world!')
+
+    data = sock.recv(1024)
+    sock.close()
+
     print(data)
 
 
