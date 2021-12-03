@@ -3,6 +3,26 @@ import socket
 import sys
 from threading import Thread
 import traceback
+import tkinter as tk
+from time import sleep
+import csv
+
+
+FILENAME = 'data.csv'
+
+
+def read_csv():
+    data = []
+    with open(FILENAME, newline='') as f:
+        reader = csv.reader(f)
+        try:
+            for row in reader:
+                # print(row)
+                data.append(row)
+        except csv.Error as e:
+            sys.exit('file {}, line {}: {}'.format(FILENAME, reader.line_num, e))
+    return data
+    # print(data)
 
 
 def do_some_stuffs_with_input(input_string):
@@ -43,6 +63,9 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
 
 def start_server():
 
+    data = read_csv()
+    #print(data)
+
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # this is for easy starting/killing the app
     soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -76,4 +99,5 @@ def start_server():
     soc.close()
 
 
-start_server()
+if __name__ == '__main__':
+    start_server()
