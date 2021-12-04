@@ -3,6 +3,7 @@ import socket
 import sys
 import traceback
 from time import sleep
+import pickle
 
 from gui import App, GuiThread
 
@@ -24,11 +25,15 @@ def start_client():
 
     clients_input = input('What you want to proceed my dear client?\n')
     soc.send(clients_input.encode('utf8'))  # we must encode the string to bytes
+    #result_bytes = soc.recv(4096)  # the number means how the response can be in bytes
+    #result_string = result_bytes.decode('utf8')  # the return will be in bytes, so decode
     result_bytes = soc.recv(4096)  # the number means how the response can be in bytes
-    result_string = result_bytes.decode('utf8')  # the return will be in bytes, so decode
+    #print(result_bytes, type(result_bytes))
 
-    print('Result from server is {}'.format(result_string))
-    gui.output_data(result_string)
+    result_data = pickle.loads(result_bytes)
+    #print('Result from server is {}'.format(result_data))
+    gui.output_data(result_data)
+
 
 
 if __name__ == '__main__':

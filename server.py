@@ -6,6 +6,7 @@ import traceback
 import tkinter as tk
 from time import sleep
 import csv
+import pickle
 
 from gui import App
 
@@ -18,9 +19,13 @@ def read_csv():
     with open(FILENAME, newline='') as f:
         reader = csv.reader(f)
         try:
+            i = 3
             for row in reader:
                 # print(row)
                 data.append(row)
+                i -= 1
+                if i < 0:
+                    break
         except csv.Error as e:
             sys.exit('file {}, line {}: {}'.format(FILENAME, reader.line_num, e))
     return data
@@ -58,14 +63,20 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
     print("Result of processing {} is: {}".format(input_from_client, res))
 
     vysl = res.encode("utf8")  # encode the result string
-    conn.sendall(vysl)  # send it to client
+    packed_data = pickle.dumps(data)
+
+    #conn.sendall(vysl)  # send it to client
+    conn.sendall(packed_data)
     conn.close()  # close connection
     print('Connection ' + ip + ':' + port + " ended")
 
+    #print(data)
+
 
 def start_server():
-
+    global data
     data = read_csv()
+    #data = [[1,2,3],[4,5,6],[7,8,9]]
     #print(data)
 
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

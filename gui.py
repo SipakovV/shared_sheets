@@ -4,9 +4,7 @@ from time import sleep
 #test.txt srelgiuhsr
 
 class App(tk.Frame):
-    #testffff
-    #test gui
-    data = None
+    data = None  # эту переменную выводите на экран
 
     def __init__(self, master=None):
         super().__init__(master)
@@ -29,8 +27,9 @@ class App(tk.Frame):
     def print_contents(self, event):
         print('Hi. The current entry content is:', self.contents.get())
 
-    def get_data(self, data):
+    def set_data(self, data):
         self.data = data
+        print('gui_data = ', data)
 
 
 class GuiThread(Thread):
@@ -44,6 +43,7 @@ class GuiThread(Thread):
         print('GUI thread ended!')
 
     def output_data(self, data):
-        print(f'{data=}')
+        self.app.set_data(data)
+        #print(f'{data=}')
 
 
