@@ -26,19 +26,26 @@ class App(tk.Frame):
         self.entrythingy.bind('<Key-Return>', self.print_contents)
 
     def print_contents(self, event):
-        print('Hi. The current entry content is:',
-              self.contents.get())
+        print('Hi. The current entry content is:', self.contents.get())
 
     def get_data(self, data):
         self.data = data
 
+
 class GuiThread(Thread):
+
+    def __init__(self):
+        super().__init__()
 
     def run(self):
         print('GUI thread started!')
-        app = App()
-        app.master.title('Window')
-        app.master.maxsize(1000, 400)
-        app.mainloop()
+        self.app = App()
+        self.app.master.title('Window')
+        self.app.master.maxsize(1000, 400)
+        self.app.mainloop()
         print('GUI thread ended!')
+
+    def output_data(self, data):
+        print(f'{data=}')
+
 

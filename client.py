@@ -12,8 +12,8 @@ data = []
 def start_client():
 
     try:
-        thread = GuiThread()
-        thread.start()
+        gui = GuiThread()
+        gui.start()
     except:
         print("Terrible error!")
         traceback.print_exc()
@@ -27,8 +27,7 @@ def start_client():
     result_string = result_bytes.decode('utf8')  # the return will be in bytes, so decode
 
     print('Result from server is {}'.format(result_string))
-
-
+    gui.output_data(result_string)
 
 
 if __name__ == '__main__':
