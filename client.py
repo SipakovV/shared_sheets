@@ -12,7 +12,7 @@ data = []
 def start_client():
 
     try:
-        gui = GuiThread()
+        gui = GuiThread(daemon=True)
         gui.start()
     except:
         print("Terrible error!")
