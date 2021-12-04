@@ -45,7 +45,7 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
 
     print('Test')
     # MAX_BUFFER_SIZE is how big the message can be
-    # this is test if it's sufficiently big
+    # this is test.txt if it's sufficiently big
 
     siz = sys.getsizeof(input_from_client_bytes)
     if siz >= MAX_BUFFER_SIZE:

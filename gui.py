@@ -1,7 +1,7 @@
 import tkinter as tk
 from threading import Thread
 from time import sleep
-#test srelgiuhsr
+#test.txt srelgiuhsr
 
 class App(tk.Frame):
 
