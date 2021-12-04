@@ -35,6 +35,5 @@ def start_client():
     gui.output_data(result_data)
 
 
-
 if __name__ == '__main__':
     start_client()
