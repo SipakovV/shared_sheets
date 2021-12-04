@@ -93,7 +93,7 @@ def start_server():
         ip, port = str(addr[0]), str(addr[1])
         print('Accepting connection from ' + ip + ':' + port)
         try:
-            Thread(target=client_thread, args=(conn, ip, port)).start()
+            Thread(target=client_thread, args=(conn, ip, port), daemon=True).start()
         except:
             print("Terrible error!")
             traceback.print_exc()

@@ -20,7 +20,7 @@ def gui_thread():
 def start_client():
 
     try:
-        Thread(target=gui_thread).start()
+        Thread(target=gui_thread, daemon=True).start()
     except:
         print("Terrible error!")
         traceback.print_exc()
