@@ -1,7 +1,7 @@
 import tkinter as tk
 from threading import Thread
 from time import sleep
-
+#test srelgiuhsr
 
 class App(tk.Frame):
 
@@ -33,9 +33,6 @@ class App(tk.Frame):
 
 
 class GuiThread(Thread):
-
-    def __init__(self):
-        super().__init__()
 
     def run(self):
         print('GUI thread started!')
