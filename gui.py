@@ -27,7 +27,7 @@ class App(tk.Frame):
         self.entrythingy.bind('<Key-Return>', self.print_contents)
 
     def print_contents(self, event):
-        print('Hi. The current entry content is:', self.contents.get())
+        print('The current entry content is:', self.contents.get())
 
     def get_data(self, data):
         self.data = data
