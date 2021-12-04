@@ -87,7 +87,7 @@ def start_server():
     # for handling task in separate jobs we need threading
 
     # this will make an infinite loop needed for
-    # not reseting server for every client
+    # not resetting server for every client
     while True:
         conn, addr = soc.accept()
         ip, port = str(addr[0]), str(addr[1])
