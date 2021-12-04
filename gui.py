@@ -5,6 +5,7 @@ from time import sleep
 
 class App(tk.Frame):
     #testffff
+    #test gui
     data = None
 
     def __init__(self, master=None):
