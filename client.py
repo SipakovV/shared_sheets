@@ -2,6 +2,7 @@
 import socket
 import sys
 import traceback
+from threading import Thread
 from time import sleep
 import pickle
 from queue import Queue
@@ -15,6 +16,16 @@ queue_to_gui = Queue()
 queue_from_gui = Queue()
 
 
+def listening_thread(soc, gui, MAX_BUFFER_SIZE = 4096):
+    while True:
+        try:
+            result_data = get_data_from_server(soc)
+            print(result_data[0])
+            gui.output_data(result_data)
+        except:
+            break
+
+
 def get_query(gui):
     return gui.get_query()
 
@@ -24,10 +35,10 @@ def send_query(query, soc):
     soc.send(packed_query)
 
 
-def get_data_from_server(soc, gui):
+def get_data_from_server(soc):
     result_bytes = soc.recv(4096)  # the number means how the response can be in bytes
     result_data = pickle.loads(result_bytes)
-    gui.output_data(result_data)
+    return result_data
 
 
 def get_number_of_pages(soc, gui):
@@ -44,7 +55,7 @@ def start_client():
         gui.setDaemon(True)
         gui.start()
     except:
-        print("Terrible error!")
+        print("Error while starting GUI thread")
         traceback.print_exc()
 
     sleep(1)
@@ -54,12 +65,18 @@ def start_client():
 
     get_number_of_pages(soc, gui)
 
+    try:
+        Thread(target=listening_thread, args=(soc, gui), daemon=True).start()
+    except:
+        print("Error while starting listening thread")
+        traceback.print_exc()
+
     while True:
         query = get_query(gui)
         if query:
             print('query = ', query)
             send_query(query, soc)
-            get_data_from_server(soc, gui)
+
         sleep(0.05)
         if not gui.is_alive():
             break

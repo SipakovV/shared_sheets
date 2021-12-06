@@ -11,8 +11,8 @@ class App(tk.Frame):
     max_pages = 1
     page = 1
     queue = Queue()
-    x = 1
-    y = 2
+    row = 1
+    col = 2
     cell_value = 5
 
     def __init__(self, master=None):
@@ -71,8 +71,8 @@ class App(tk.Frame):
         self.page -= 1
         self.get_page_query()
 
-    def edit_query(self):
-        self.send_to_master(['edit', self.page, self.x, self.y])
+    def edit_query(self, event):
+        self.send_to_master(['edit', self.page, self.row, self.col])
 
     def confirm_edit(self, event):
         self.send_to_master(['confirm', self.cell_value])
@@ -86,6 +86,7 @@ class App(tk.Frame):
         self.draw_page(self.data)
 
     def draw_page(self, data):
+        #print('GUI got data ')
         print('GUI got data ', data)
 
 
