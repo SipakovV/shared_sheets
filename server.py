@@ -12,14 +12,20 @@ from gui import App
 
 
 FILENAME = 'data.csv'
+PAGE_SIZE = 10
+
+
+busy_cells = {}
+
+data = []
+number_of_pages = 0
 
 
 def read_csv():
-    data = []
     with open(FILENAME, newline='') as f:
         reader = csv.reader(f)
         try:
-            i = 3
+            i = 40
             for row in reader:
                 data.append(row)
                 i -= 1
@@ -30,18 +36,33 @@ def read_csv():
     return data
 
 
-def do_some_stuffs_with_input(input_string):
-    """
-    This is where all the processing happens.
+def process_query(conn, query):
+    print("Processing query...")
 
-    Let's just read the string backwards
-    """
+    query_dict = {
+        #'get': send_page(conn, query[1]),
+        #'edit': busy_cells['']
+    }
 
-    print("Processing that nasty input!")
-    return input_string[::-1]
+    print(conn, type(conn))
+    #query_dict[query[0]]
+
+
+def send_page(conn, page):
+    rows_from = (page - 1) * PAGE_SIZE + 1
+    rows_to = page * PAGE_SIZE + 1
+    table = data[rows_from:rows_to]
+    #print(table)
+
+    packed_table = pickle.dumps(table)
+    conn.sendall(packed_table)
 
 
 def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
+
+    global number_of_pages
+    pages_num = pickle.dumps([number_of_pages])
+    conn.sendall(pages_num)
 
     while True:
         # the input is in bytes, so decode it
@@ -60,18 +81,19 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
         input_from_client1 = pickle.loads(input_from_client_bytes)
         print('Query = ', input_from_client1)
 
-        #res = do_some_stuffs_with_input(input_from_client)
-        #print("Result of processing {} is: {}".format(input_from_client, res))
-        #packed_data = pickle.dumps(data)
+        process_query(conn, input_from_client1)
 
-        #conn.sendall(packed_data)
-        #conn.close()  # close connection
+    #conn.close()  # close connection
     #print('Connection ' + ip + ':' + port + " ended")
 
 
 def start_server():
     global data
+    global number_of_pages
     data = read_csv()
+    number_of_pages = len(data) // PAGE_SIZE + 1
+
+    print('Csv file read (pages:', number_of_pages, ')')
 
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # this is for easy starting/killing the app

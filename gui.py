@@ -4,13 +4,15 @@ from time import sleep
 from queue import Queue
 #test.txt srelgiuhsr
 
+
 class App(tk.Frame):
     data = None  # эту переменную выводите на экран
+    max_pages = 1
     page = 1
     queue = Queue()
     x = 1
     y = 2
-
+    cell_value = 5
 
     def __init__(self, master=None):
         super().__init__(master)
@@ -32,6 +34,8 @@ class App(tk.Frame):
         self.entrythingy.bind('<Key-F4>', self.get_prev_page)
         self.entrythingy.bind('<Key-F6>', self.get_next_page)
         self.entrythingy.bind('<Key-F1>', self.edit_query)
+        self.entrythingy.bind('<Key-F2>', self.confirm_edit)
+        self.entrythingy.bind('<Key-F3>', self.rollback_edit)
         self.entrythingy.bind('<Key-Return>', self.print_contents)
 
     def print_contents(self, event):
@@ -40,10 +44,6 @@ class App(tk.Frame):
     def send_to_master(self, query):
         self.queue.put(query)
         print('send_to_master:', query)
-
-    def set_data(self, data):
-        self.data = data
-        print('gui_data = ', data)
 
     def get_page_query(self, event):
         self.send_to_master(['get', self.page])
@@ -58,6 +58,20 @@ class App(tk.Frame):
 
     def edit_query(self, event):
         self.send_to_master(['edit', self.page, self.x, self.y])
+
+    def confirm_edit(self, event):
+        self.send_to_master(['confirm', self.cell_value])
+
+    def rollback_edit(self, event):
+        self.send_to_master(['rollback'])
+
+    def set_data(self, data):
+        self.data = data
+        #print('gui_data = ', self.data)
+        self.draw_page(self.data)
+
+    def draw_page(self, data):
+        print('GUI got data ', data)
 
 
 class GuiThread(Thread):
@@ -83,3 +97,9 @@ class GuiThread(Thread):
         else:
             return self.app.queue.get(self)
 
+    def set_data(self, data):
+        self.app.set_data(data)
+
+    def set_number_of_pages(self, num):
+        self.app.max_pages = num
+        print(f'Pages: {self.app.max_pages}')
