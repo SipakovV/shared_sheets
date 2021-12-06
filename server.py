@@ -12,16 +12,21 @@ from gui import App
 
 
 FILENAME = 'data.csv'
+PAGE_SIZE = 10
+
+
+busy_cells = {}
+
+data = []
+number_of_pages = 0
 
 
 def read_csv():
-    data = []
     with open(FILENAME, newline='') as f:
         reader = csv.reader(f)
         try:
-            i = 3
+            i = 40
             for row in reader:
-                # print(row)
                 data.append(row)
                 i -= 1
                 if i < 0:
@@ -29,55 +34,66 @@ def read_csv():
         except csv.Error as e:
             sys.exit('file {}, line {}: {}'.format(FILENAME, reader.line_num, e))
     return data
-    # print(data)
 
 
-def do_some_stuffs_with_input(input_string):
-    """
-    This is where all the processing happens.
+def process_query(conn, query):
+    print("Processing query...")
 
-    Let's just read the string backwards
-    """
+    query_dict = {
+        #'get': send_page(conn, query[1]),
+        #'edit': busy_cells['']
+    }
 
-    print("Processing that nasty input!")
-    return input_string[::-1]
+    print(conn, type(conn))
+    #query_dict[query[0]]
+
+
+def send_page(conn, page):
+    rows_from = (page - 1) * PAGE_SIZE + 1
+    rows_to = page * PAGE_SIZE + 1
+    table = data[rows_from:rows_to]
+    #print(table)
+
+    packed_table = pickle.dumps(table)
+    conn.sendall(packed_table)
 
 
 def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
 
-    # the input is in bytes, so decode it
-    input_from_client_bytes = conn.recv(MAX_BUFFER_SIZE)
+    global number_of_pages
+    pages_num = pickle.dumps([number_of_pages])
+    conn.sendall(pages_num)
 
-    print('Test')
-    # MAX_BUFFER_SIZE is how big the message can be
-    # this is test.txt if it's sufficiently big
+    while True:
+        # the input is in bytes, so decode it
+        input_from_client_bytes = conn.recv(MAX_BUFFER_SIZE)
 
-    siz = sys.getsizeof(input_from_client_bytes)
-    if siz >= MAX_BUFFER_SIZE:
-        print("The length of input is probably too long: {}".format(siz))
+        print('Test')
+        # MAX_BUFFER_SIZE is how big the message can be
+        # this is test.txt if it's sufficiently big
 
-    # decode input and strip the end of line
-    input_from_client = input_from_client_bytes.decode("utf8").rstrip()
+        siz = sys.getsizeof(input_from_client_bytes)
+        if siz >= MAX_BUFFER_SIZE:
+            print("The length of input is probably too long: {}".format(siz))
 
-    res = do_some_stuffs_with_input(input_from_client)
-    print("Result of processing {} is: {}".format(input_from_client, res))
+        # decode input and strip the end of line
 
-    vysl = res.encode("utf8")  # encode the result string
-    packed_data = pickle.dumps(data)
+        input_from_client1 = pickle.loads(input_from_client_bytes)
+        print('Query = ', input_from_client1)
 
-    #conn.sendall(vysl)  # send it to client
-    conn.sendall(packed_data)
-    conn.close()  # close connection
-    print('Connection ' + ip + ':' + port + " ended")
+        process_query(conn, input_from_client1)
 
-    #print(data)
+    #conn.close()  # close connection
+    #print('Connection ' + ip + ':' + port + " ended")
 
 
 def start_server():
     global data
+    global number_of_pages
     data = read_csv()
-    #data = [[1,2,3],[4,5,6],[7,8,9]]
-    #print(data)
+    number_of_pages = len(data) // PAGE_SIZE + 1
+
+    print('Csv file read (pages:', number_of_pages, ')')
 
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # this is for easy starting/killing the app

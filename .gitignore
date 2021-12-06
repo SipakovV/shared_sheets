@@ -1,4 +1,5 @@
 /__pycache__
 /.idea
-
 /old
+.~lock.*
+test.py
