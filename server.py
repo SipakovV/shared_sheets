@@ -57,17 +57,19 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
         print("The length of input is probably too long: {}".format(siz))
 
     # decode input and strip the end of line
-    input_from_client = input_from_client_bytes.decode("utf8").rstrip()
+    input_from_client1 = pickle.loads(input_from_client_bytes)
+    print('Query = ', input_from_client1)
+    #input_from_client = input_from_client_bytes.decode("utf8").rstrip()
 
-    res = do_some_stuffs_with_input(input_from_client)
-    print("Result of processing {} is: {}".format(input_from_client, res))
+    #res = do_some_stuffs_with_input(input_from_client)
+    #print("Result of processing {} is: {}".format(input_from_client, res))
 
-    vysl = res.encode("utf8")  # encode the result string
-    packed_data = pickle.dumps(data)
+    #vysl = res.encode("utf8")  # encode the result string
+    #packed_data = pickle.dumps(data)
 
     #conn.sendall(vysl)  # send it to client
-    conn.sendall(packed_data)
-    conn.close()  # close connection
+    #conn.sendall(packed_data)
+    #conn.close()  # close connection
     print('Connection ' + ip + ':' + port + " ended")
 
     #print(data)
