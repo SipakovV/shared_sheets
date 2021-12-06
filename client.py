@@ -54,7 +54,6 @@ def start_client():
 
     get_number_of_pages(soc, gui)
 
-
     while True:
         query = get_query(gui)
         if query:
@@ -62,6 +61,8 @@ def start_client():
             send_query(query, soc)
             get_data_from_server(soc, gui)
         sleep(0.05)
+        if not gui.is_alive():
+            break
 
     """
     clients_input = input('What you want to proceed my dear client?\n')
