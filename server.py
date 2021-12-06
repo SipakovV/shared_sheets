@@ -21,7 +21,6 @@ def read_csv():
         try:
             i = 3
             for row in reader:
-                # print(row)
                 data.append(row)
                 i -= 1
                 if i < 0:
@@ -29,7 +28,6 @@ def read_csv():
         except csv.Error as e:
             sys.exit('file {}, line {}: {}'.format(FILENAME, reader.line_num, e))
     return data
-    # print(data)
 
 
 def do_some_stuffs_with_input(input_string):
@@ -61,27 +59,19 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
 
         input_from_client1 = pickle.loads(input_from_client_bytes)
         print('Query = ', input_from_client1)
-        #input_from_client = input_from_client_bytes.decode("utf8").rstrip()
 
         #res = do_some_stuffs_with_input(input_from_client)
         #print("Result of processing {} is: {}".format(input_from_client, res))
-
-        #vysl = res.encode("utf8")  # encode the result string
         #packed_data = pickle.dumps(data)
 
-        #conn.sendall(vysl)  # send it to client
         #conn.sendall(packed_data)
         #conn.close()  # close connection
-    print('Connection ' + ip + ':' + port + " ended")
-
-    #print(data)
+    #print('Connection ' + ip + ':' + port + " ended")
 
 
 def start_server():
     global data
     data = read_csv()
-    #data = [[1,2,3],[4,5,6],[7,8,9]]
-    #print(data)
 
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # this is for easy starting/killing the app

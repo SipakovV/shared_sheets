@@ -47,17 +47,14 @@ def start_client():
             send_query(query, soc)
         sleep(0.05)
 
-
+    """
     clients_input = input('What you want to proceed my dear client?\n')
     soc.send(clients_input.encode('utf8'))  # we must encode the string to bytes
-    #result_bytes = soc.recv(4096)  # the number means how the response can be in bytes
-    #result_string = result_bytes.decode('utf8')  # the return will be in bytes, so decode
     result_bytes = soc.recv(4096)  # the number means how the response can be in bytes
-    #print(result_bytes, type(result_bytes))
 
     result_data = pickle.loads(result_bytes)
-    #print('Result from server is {}'.format(result_data))
     gui.output_data(result_data)
+    """
 
 
 if __name__ == '__main__':

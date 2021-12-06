@@ -62,9 +62,8 @@ class App(tk.Frame):
 
 class GuiThread(Thread):
 
-    def __init__(self):
-        Thread.__init__(self)
-
+    #def __init__(self):
+    #    Thread.__init__(self)
 
     def run(self):
         print('GUI thread started!')
