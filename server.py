@@ -45,31 +45,33 @@ def do_some_stuffs_with_input(input_string):
 
 def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
 
-    # the input is in bytes, so decode it
-    input_from_client_bytes = conn.recv(MAX_BUFFER_SIZE)
+    while True:
+        # the input is in bytes, so decode it
+        input_from_client_bytes = conn.recv(MAX_BUFFER_SIZE)
 
-    print('Test')
-    # MAX_BUFFER_SIZE is how big the message can be
-    # this is test.txt if it's sufficiently big
+        print('Test')
+        # MAX_BUFFER_SIZE is how big the message can be
+        # this is test.txt if it's sufficiently big
 
-    siz = sys.getsizeof(input_from_client_bytes)
-    if siz >= MAX_BUFFER_SIZE:
-        print("The length of input is probably too long: {}".format(siz))
+        siz = sys.getsizeof(input_from_client_bytes)
+        if siz >= MAX_BUFFER_SIZE:
+            print("The length of input is probably too long: {}".format(siz))
 
-    # decode input and strip the end of line
-    input_from_client1 = pickle.loads(input_from_client_bytes)
-    print('Query = ', input_from_client1)
-    #input_from_client = input_from_client_bytes.decode("utf8").rstrip()
+        # decode input and strip the end of line
 
-    #res = do_some_stuffs_with_input(input_from_client)
-    #print("Result of processing {} is: {}".format(input_from_client, res))
+        input_from_client1 = pickle.loads(input_from_client_bytes)
+        print('Query = ', input_from_client1)
+        #input_from_client = input_from_client_bytes.decode("utf8").rstrip()
 
-    #vysl = res.encode("utf8")  # encode the result string
-    #packed_data = pickle.dumps(data)
+        #res = do_some_stuffs_with_input(input_from_client)
+        #print("Result of processing {} is: {}".format(input_from_client, res))
 
-    #conn.sendall(vysl)  # send it to client
-    #conn.sendall(packed_data)
-    #conn.close()  # close connection
+        #vysl = res.encode("utf8")  # encode the result string
+        #packed_data = pickle.dumps(data)
+
+        #conn.sendall(vysl)  # send it to client
+        #conn.sendall(packed_data)
+        #conn.close()  # close connection
     print('Connection ' + ip + ':' + port + " ended")
 
     #print(data)
