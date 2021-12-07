@@ -9,7 +9,7 @@ import sys
 class App(tk.Frame):
 
     data = [["???" for y in range(10)] for x in range(10)]  #None # эту переменную выводите на экран
-    header = []
+    header = ["Series_reference", "Period", "Data_value", "Suppressed", "STATUS", "UNITS", "Magnitude", "Subject", "Group", "Series_title_1"]
     busy_cells = []
 
     max_pages = 1
@@ -23,13 +23,20 @@ class App(tk.Frame):
         super().__init__(master)
         self.pack()
 
-        self.entrythingy = tk.Entry()
+        #self.entrythingy = tk.Entry()
         #self.entrythingy.pack()
 
         # Create the application variable.
         #self.contents = tk.StringVar()
         # Set it to some value.
         #self.contents.set('this is a variable')
+        
+        #заголовки
+        i = 0
+        while i < 10:
+            self.hdr = tk.Label(text=self.header[i])
+            self.hdr.place(x=10+(150*i),y=10)
+            i+=1
         
         # кнопки управления страницами
         self.bt2 = tk.Button(master, text="Backward", activebackground='#eeeeee', activeforeground='#000000',
@@ -42,15 +49,15 @@ class App(tk.Frame):
                              bg='#a0a000', fg='#ffffff', width=10, command=self.get_next_page)
         self.btn.place(x=310, y=550)
 
-        # таблица (command=self.edit_query заменить лямбда-функцией)
+        # таблица
         i = 0
         while i < 10:
             j = 0
             while j < 10:
                 if j % 2 == 0:
-                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbbbff', fg='#000000', height=2, width=13, relief = tk.RIDGE, wraplength=140, command=self.edit_query)
+                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#ffffff', fg='#000000', height=2, width=13, relief = tk.RIDGE, wraplength=140, command=lambda i1=i, j1=j: self.edit_query(i1,j1))
                 else:
-                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbffbb', fg='#000000', height=2, width=13, relief = tk.RIDGE, wraplength=140, command=self.edit_query)
+                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#f0f0f0', fg='#000000', height=2, width=13, relief = tk.RIDGE, wraplength=140, command=lambda i1=i, j1=j: self.edit_query(i1,j1))
                 self.tab.place(x=10+(150*j), y=50+(50*i))
                 j += 1
             i += 1
@@ -62,13 +69,13 @@ class App(tk.Frame):
 
         # Define a callback for when the user hits return.
         # It prints the current value of the variable.
-        self.entrythingy.bind('<Key-F5>', self.get_page_query)
-        self.entrythingy.bind('<Key-F4>', self.get_prev_page)
-        self.entrythingy.bind('<Key-F6>', self.get_next_page)
-        self.entrythingy.bind('<Key-F1>', self.edit_query)
-        self.entrythingy.bind('<Key-F2>', self.confirm_edit)
-        self.entrythingy.bind('<Key-F3>', self.rollback_edit)
-        self.entrythingy.bind('<Key-Return>', self.print_contents)
+        #self.entrythingy.bind('<Key-F5>', self.get_page_query)
+        #self.entrythingy.bind('<Key-F4>', self.get_prev_page)
+        #self.entrythingy.bind('<Key-F6>', self.get_next_page)
+        #self.entrythingy.bind('<Key-F1>', self.edit_query)
+        #self.entrythingy.bind('<Key-F2>', self.confirm_edit)
+        #self.entrythingy.bind('<Key-F3>', self.rollback_edit)
+        #self.entrythingy.bind('<Key-Return>', self.print_contents)
 
     def print_contents(self, event):
         print('Hi. The current entry content is:', self.contents.get())
@@ -106,7 +113,7 @@ class App(tk.Frame):
         print('GUI got data ')
         #print('GUI got data ', data)
 
-        # таблица в функции (command=self.edit_query заменить лямбда-функцией)
+        # таблица в функции
         self.data = data
         max_x = 10
         max_y = 10
@@ -115,9 +122,9 @@ class App(tk.Frame):
             j = 0
             while j < max_x:
                 if j % 2 == 0:
-                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbbbff', fg='#000000', height=2, width=13, relief=tk.RIDGE, wraplength=140, command=self.edit_query)
+                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#ffffff', fg='#000000', height=2, width=13, relief=tk.RIDGE, wraplength=140, command=lambda i1=i, j1=j: self.edit_query(i1,j1))
                 else:
-                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbffbb', fg='#000000', height=2, width=13, relief=tk.RIDGE, wraplength=140, command=self.edit_query)
+                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#f0f0f0', fg='#000000', height=2, width=13, relief=tk.RIDGE, wraplength=140, command=lambda i1=i, j1=j: self.edit_query(i1,j1))
                 self.tab.place(x=10+(150*j), y=50+(50*i))
                 j += 1
             i += 1
@@ -138,6 +145,7 @@ class GuiThread(Thread):
         print('GUI thread started!')
         self.app = App()
         self.app.master.title('Window')
+        self.app.master.minsize(1800,800)
         self.app.master.maxsize(1800, 800)
         self.app.mainloop()
         print('GUI thread ended!')
