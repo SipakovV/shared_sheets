@@ -47,9 +47,9 @@ class App(tk.Frame):
                     self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbbbff', fg='#000000', height=2, width=13, relief = tk.RIDGE, wraplength=140, command=self.edit_query)
                 else:
                     self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbffbb', fg='#000000', height=2, width=13, relief = tk.RIDGE, wraplength=140, command=self.edit_query)
-                self.tab.place(x=10+(150*j),y=50+(50*i))
-                j+=1
-            i+=1
+                self.tab.place(x=10+(150*j), y=50+(50*i))
+                j += 1
+            i += 1
             
         #self.draw_page
         
