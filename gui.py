@@ -121,7 +121,6 @@ class App(tk.Frame):
                 self.tab.place(x=10+(150*j), y=50+(50*i))
                 j += 1
             i += 1
-        print('GUI got data ', data)
 
     def set_header(self, header):
         self.header = header
