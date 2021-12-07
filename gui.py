@@ -27,7 +27,7 @@ class App(tk.Frame):
         # Set it to some value.
         #self.contents.set('this is a variable')
         
-        #кнопки управления страницами
+        # кнопки управления страницами
         self.bt2 = tk.Button(master, text="Backward", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#a0a000', fg='#ffffff', width=10, command=self.get_prev_page)
         self.bt2.place(x=10, y=550)
@@ -38,12 +38,12 @@ class App(tk.Frame):
                              bg='#a0a000', fg='#ffffff', width=10, command=self.get_next_page)
         self.btn.place(x=310, y=550)
 
-        #таблица (command=self.edit_query заменить лямбда-функцией)
+        # таблица (command=self.edit_query заменить лямбда-функцией)
         i = 0
-        while i<10:
+        while i < 10:
             j = 0
-            while j<10:
-                if (j%2 == 0):
+            while j < 10:
+                if j % 2 == 0:
                     self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbbbff', fg='#000000', height=2, width=13, relief = tk.RIDGE, wraplength=140, command=self.edit_query)
                 else:
                     self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbffbb', fg='#000000', height=2, width=13, relief = tk.RIDGE, wraplength=140, command=self.edit_query)
@@ -84,8 +84,8 @@ class App(tk.Frame):
         self.page -= 1
         self.get_page_query()
 
-    def edit_query(self):
-        self.send_to_master(['edit', self.page, self.row, self.col])
+    def edit_query(self, row, col):
+        self.send_to_master(['edit', self.page, row, col])
 
     def confirm_edit(self, event):
         self.send_to_master(['confirm', self.cell_value])
@@ -100,21 +100,21 @@ class App(tk.Frame):
 
     def draw_page(self, data):
         #print('GUI got data ')
-        #таблица в функции (command=self.edit_query заменить лямбда-функцией)
+        # таблица в функции (command=self.edit_query заменить лямбда-функцией)
         self.data = data
         max_x = 10
         max_y = 10
         i = 0
-        while i<max_y:
+        while i < max_y:
             j = 0
-            while j<max_x:
-                if (j%2 == 0):
-                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbbbff', fg='#000000', height=2, width=13, relief = tk.RIDGE, wraplength=140, command=self.edit_query)
+            while j < max_x:
+                if j % 2 == 0:
+                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbbbff', fg='#000000', height=2, width=13, relief=tk.RIDGE, wraplength=140, command=self.edit_query)
                 else:
-                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbffbb', fg='#000000', height=2, width=13, relief = tk.RIDGE, wraplength=140, command=self.edit_query)
+                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbffbb', fg='#000000', height=2, width=13, relief=tk.RIDGE, wraplength=140, command=self.edit_query)
                 self.tab.place(x=10+(150*j), y=50+(50*i))
-                j+=1
-            i+=1
+                j += 1
+            i += 1
         print('GUI got data ', data)
 
 
