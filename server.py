@@ -14,24 +14,28 @@ from gui import App
 FILENAME = 'data.csv'
 PAGE_SIZE = 10
 
-
 busy_cells = {}
 clients_pages = {}
 
 data = []
 number_of_pages = 0
+row_size = 0
 
 
 def read_csv():
     with open(FILENAME, newline='') as f:
         reader = csv.reader(f)
+        header_flag = True
         try:
-            i = 40
+            #i = 40
             for row in reader:
                 data.append(row)
-                i -= 1
-                if i < 0:
-                    break
+                if header_flag:
+                    global row_size
+                    row_size = len(row)
+                #i -= 1
+                #if i < 0:
+                #    break
         except csv.Error as e:
             sys.exit('file {}, line {}: {}'.format(FILENAME, reader.line_num, e))
     return data
@@ -90,8 +94,8 @@ def confirm_edit(conn, thread_id, coords):  #
     if cell_id in busy_cells:
         if busy_cells[cell_id] == thread_id:
             del busy_cells[cell_id]
-            row = cell_id // 10
-            col = cell_id % 10
+            row = cell_id // row_size
+            col = cell_id % row_size
             print(row, col)
             print(data[0])
             data[row][col] = coords
@@ -101,7 +105,7 @@ def confirm_edit(conn, thread_id, coords):  #
 
 def check_edit(conn, thread_id, coords):  # проверяет, занята ли клетка: если не занята - занимает
     print(coords)
-    cell_id = 10 * PAGE_SIZE * (coords[0]-1) + 10 * coords[1] + coords[2]
+    cell_id = row_size * PAGE_SIZE * (coords[0]-1) + row_size * coords[1] + coords[2]
     if cell_id not in busy_cells:
         busy_cells[cell_id] = thread_id
         broadcast_page(conn, coords[0])
@@ -129,9 +133,9 @@ def send_page(conn, page):  # отправляет страницу одному
 
     in_edit = []
     for key in busy_cells.keys():
-        key_page = key // (PAGE_SIZE * 10)
-        key_row = key % (PAGE_SIZE * 10) // 10
-        key_col = key % 10
+        key_page = key // (PAGE_SIZE * row_size)
+        key_row = key % (PAGE_SIZE * row_size) // row_size
+        key_col = key % row_size
         if page - 1 == key_page:
             in_edit.append((key_row, key_col))
 
@@ -142,6 +146,9 @@ def send_page(conn, page):  # отправляет страницу одному
         'header': header,
         'edit': in_edit,
         'page_num': page,
+        'filename': FILENAME,
+        'page_size': PAGE_SIZE,
+        'row_size': row_size,
     }
 
     packed_data = pickle.dumps(data_dict)
@@ -189,7 +196,7 @@ def start_server():
     data = read_csv()
     number_of_pages = len(data) // PAGE_SIZE + 1
 
-    print('Csv file read (pages:', number_of_pages, ')')
+    print(f'Csv file read (pages: {number_of_pages}, columns: {row_size})')
 
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # this is for easy starting/killing the app

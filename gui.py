@@ -14,10 +14,11 @@ class App(tk.Frame):
 
     max_pages = 1
     page = 1
-    queue = Queue()
-    row = 1
-    col = 2
+    row_size = 10
+    page_size = 10
     cell_value = 5
+
+    queue = Queue()
 
     def __init__(self, master=None):
         super().__init__(master)
@@ -32,30 +33,31 @@ class App(tk.Frame):
         #self.contents.set('this is a variable')
         
         # кнопки управления страницами
-        self.bt2 = tk.Button(master, text="Backward", activebackground='#eeeeee', activeforeground='#000000',
+        self.bt2 = tk.Button(master, text="Previous page", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#a0a000', fg='#ffffff', width=10, command=self.get_prev_page)
         self.bt2.place(x=10, y=550)
         self.bt3 = tk.Button(master, text="Refresh", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#00a000', fg='#ffffff', width=10, command=self.get_page_query)
         self.bt3.place(x=160, y=550)
-        self.btn = tk.Button(master, text="Forward", activebackground='#eeeeee', activeforeground='#000000',
+        self.btn = tk.Button(master, text="Next page", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#a0a000', fg='#ffffff', width=10, command=self.get_next_page)
         self.btn.place(x=310, y=550)
 
+        '''
         # таблица (command=self.edit_query заменить лямбда-функцией)
         i = 0
-        while i < 10:
+        while i < self.page_size:
             j = 0
-            while j < 10:
+            while j < self.row_size:
                 if j % 2 == 0:
-                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbbbff', fg='#000000', height=2, width=13, relief = tk.RIDGE, wraplength=140, command=self.edit_query)
+                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbbbff', fg='#000000', height=2, width=13, relief=tk.RIDGE, wraplength=140, command=self.edit_query)
                 else:
-                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbffbb', fg='#000000', height=2, width=13, relief = tk.RIDGE, wraplength=140, command=self.edit_query)
+                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbffbb', fg='#000000', height=2, width=13, relief=tk.RIDGE, wraplength=140, command=self.edit_query)
                 self.tab.place(x=10+(150*j), y=50+(50*i))
                 j += 1
             i += 1
-            
-        #self.draw_page
+        '''
+        self.draw_page()
         
         # Tell the entry widget to watch this variable.
         #self.entrythingy['textvariable'] = self.contents
@@ -100,20 +102,17 @@ class App(tk.Frame):
     def set_data(self, data):
         self.data = data
         #print('gui_data = ', self.data)
-        self.draw_page(self.data)
+        self.draw_page()
 
-    def draw_page(self, data):
+    def draw_page(self):
         print('GUI got data ')
         #print('GUI got data ', data)
 
         # таблица в функции (command=self.edit_query заменить лямбда-функцией)
-        self.data = data
-        max_x = 10
-        max_y = 10
         i = 0
-        while i < max_y:
+        while i < self.page_size:
             j = 0
-            while j < max_x:
+            while j < self.row_size:
                 if j % 2 == 0:
                     self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbbbff', fg='#000000', height=2, width=13, relief=tk.RIDGE, wraplength=140, command=self.edit_query)
                 else:
@@ -127,6 +126,9 @@ class App(tk.Frame):
 
     def set_busy_cells(self, busy_cells):
         self.busy_cells = busy_cells
+
+    def set_row_size(self, row_size):
+        self.row_size = row_size
 
 
 class GuiThread(Thread):
@@ -143,9 +145,11 @@ class GuiThread(Thread):
         print('GUI thread ended!')
 
     def output_data(self, data):
-        self.app.set_data(data['table'])
         self.app.set_header(data['header'])
         self.app.set_busy_cells(data['edit'])
+        self.app.master.title(data['filename'])
+        self.app.set_row_size(data['row_size'])
+        self.app.set_data(data['table'])
         #print(f'{data=}')
 
     def get_query(self):
