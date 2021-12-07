@@ -123,12 +123,29 @@ def send_page(conn, page):  # отправляет страницу одному
 
     rows_from = (page - 1) * PAGE_SIZE + 1
     rows_to = page * PAGE_SIZE + 1
-    table = [data[0]]
-    table = table + data[rows_from:rows_to]
+    header = data[0]
+    table = data[rows_from:rows_to]
     print('table=', table)
 
-    packed_table = pickle.dumps(table)
-    conn.sendall(packed_table)
+    in_edit = []
+    for key in busy_cells.keys():
+        key_page = key // (PAGE_SIZE * 10)
+        key_row = key % (PAGE_SIZE * 10) // 10
+        key_col = key % 10
+        if page - 1 == key_page:
+            in_edit.append((key_row, key_col))
+
+    print(f'{in_edit=}')
+
+    data_dict = {
+        'table': table,
+        'header': header,
+        'edit': in_edit,
+        'page_num': page,
+    }
+
+    packed_data = pickle.dumps(data_dict)
+    conn.sendall(packed_data)
     print('Data sent')
 
 

@@ -8,6 +8,8 @@ import sys
 
 class App(tk.Frame):
     data = None  # эту переменную выводите на экран
+    header = []
+    busy_cells = []
     max_pages = 1
     page = 1
     queue = Queue()
@@ -86,8 +88,14 @@ class App(tk.Frame):
         self.draw_page(self.data)
 
     def draw_page(self, data):
-        #print('GUI got data ')
-        print('GUI got data ', data)
+        print('GUI got data ')
+        #print('GUI got data ', data)
+
+    def set_header(self, header):
+        self.header = header
+
+    def set_busy_cells(self, busy_cells):
+        self.busy_cells = busy_cells
 
 
 class GuiThread(Thread):
@@ -104,7 +112,9 @@ class GuiThread(Thread):
         print('GUI thread ended!')
 
     def output_data(self, data):
-        self.app.set_data(data)
+        self.app.set_data(data['table'])
+        self.app.set_header(data['header'])
+        self.app.set_busy_cells(data['edit'])
         #print(f'{data=}')
 
     def get_query(self):
@@ -112,9 +122,6 @@ class GuiThread(Thread):
             return None
         else:
             return self.app.queue.get(self)
-
-    def set_data(self, data):
-        self.app.set_data(data)
 
     def set_number_of_pages(self, num):
         self.app.max_pages = num
