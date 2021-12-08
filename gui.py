@@ -18,6 +18,7 @@ class App(tk.Frame):
     row_size = 10
     page_size = 10
     cell_value = 5
+    edited_cell = (99, 99)
 
     queue = Queue()
 
@@ -124,10 +125,13 @@ class App(tk.Frame):
         self.get_page_query()
 
     def edit_query(self, row: object, col: object) -> object:
+        self.edited_cell = row, col
         self.send_to_master(['edit', self.page, row, col])
 
     def confirm_edit(self, event):
+        self.edited_cell = (99, 99)
         self.send_to_master(['confirm', self.cell_value])
+        self.draw_page()
 
     def rollback_edit(self, event):
         self.send_to_master(['rollback'])
@@ -157,11 +161,22 @@ class App(tk.Frame):
             j = 0
             while j < self.row_size:
                 if j % 2 == 0:
-                    self.tab = tk.Entry(self.master, textvariable = self.mass[i][j], bg='#eeeeee', fg='#000000')
-                    self.tab.bind('<Key-Return>', self.confirm_edit)
-                    self.tab.insert(0, self.data[i][j])
+                    cell_bg_color = '#f0f0f0'
+                    cell_active_bg_color = '#f5f5f5'
+                    cell_fg_color = '#000000'
                 else:
-                    self.tab = tk.Entry(self.master, textvariable = self.mass[i][j], bg='white', fg='#000000')
+                    cell_bg_color = '#f9f9f9'
+                    cell_active_bg_color = '#ffffff'
+                    cell_fg_color = '#000000'
+
+                coords = (i, j)
+
+                if coords != self.edited_cell:
+                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground=cell_active_bg_color, activeforeground='#000000',
+                             bg=cell_bg_color, fg=cell_fg_color, width=10, command=(lambda x=i, y=j: self.edit_query(x, y)))
+                else:
+                    self.tab = tk.Entry(self.master, textvariable=self.mass[i][j], bg=cell_bg_color, fg=cell_fg_color)
+                    self.tab.bind('<Key-Return>', self.confirm_edit)
                     self.tab.insert(0, self.data[i][j])
                 self.tab.place(x=10+(150*j), y=50+(50*i), width=150, height=50)
                 j += 1
