@@ -78,10 +78,10 @@ class App(tk.Frame):
         self.entrythingy.bind('<Key-F5>', self.get_page_query)
         self.entrythingy.bind('<Key-F4>', self.get_prev_page)
         self.entrythingy.bind('<Key-F6>', self.get_next_page)
-        self.entrythingy.bind('<Key-F1>', self.edit_query)
-        self.entrythingy.bind('<Key-F2>', self.confirm_edit)
-        self.entrythingy.bind('<Key-F3>', self.rollback_edit)
-        self.entrythingy.bind('<Key-Return>', self.print_contents)
+        #self.entrythingy.bind('<Key-F1>', self.edit_query)
+        #self.entrythingy.bind('<Key-F2>', self.confirm_edit)
+        #self.entrythingy.bind('<Key-F3>', self.rollback_edit)
+        #self.entrythingy.bind('<Key-Return>', self.print_contents)
 
     def vvod_buttom(self):
         i = 0
@@ -159,6 +159,7 @@ class App(tk.Frame):
             while j < self.row_size:
                 if j % 2 == 0:
                     self.tab = tk.Entry(self.master, textvariable = self.mass[i][j], bg='#eeeeee', fg='#000000')
+                    self.tab.bind('<Key-Return>', self.confirm_edit)
                     self.tab.insert(0, self.data[i][j])
                 else:
                     self.tab = tk.Entry(self.master, textvariable = self.mass[i][j], bg='white', fg='#000000')
@@ -167,6 +168,7 @@ class App(tk.Frame):
                 j += 1
             i += 1
         self.Flag = 1
+        
     def set_header(self, header):
         self.header = header
 
