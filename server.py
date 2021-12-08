@@ -1,72 +1,202 @@
 # server.py
 import socket
 import sys
-from threading import Thread
+from threading import Thread, get_ident
 import traceback
 import tkinter as tk
 from time import sleep
 import csv
+import pickle
 
 from gui import App
 
 
 FILENAME = 'data.csv'
+PAGE_SIZE = 10
+
+busy_cells = {}
+clients_pages = {}
+
+data = []
+number_of_pages = 0
+row_size = 0
 
 
 def read_csv():
-    data = []
     with open(FILENAME, newline='') as f:
         reader = csv.reader(f)
+        header_flag = True
         try:
+            #i = 40
             for row in reader:
-                # print(row)
                 data.append(row)
+                if header_flag:
+                    global row_size
+                    row_size = len(row)
+                #i -= 1
+                #if i < 0:
+                #    break
         except csv.Error as e:
             sys.exit('file {}, line {}: {}'.format(FILENAME, reader.line_num, e))
     return data
-    # print(data)
 
 
-def do_some_stuffs_with_input(input_string):
-    """
-    This is where all the processing happens.
+def process_query(conn, query, thread_id):
+    print(f"Processing query {query[0]} from client {thread_id}")
+    '''
+    query_dict = {
+        'get': send_page(conn, query[1]),
+        'edit': check_edit(conn, thread_id, query[1:]),
+        'confirm': confirm_edit(conn, thread_id, query[1:]),
 
-    Let's just read the string backwards
-    """
+    }
 
-    print("Processing that nasty input!")
-    return input_string[::-1]
+    #send_page()
+    #print(conn, type(conn))
+    #query_dict[query[0]]
+    '''
+    if query[0] == 'get':
+        clients_pages[thread_id] = query[1]
+        print(f'{clients_pages=}')
+        send_page(conn, query[1])
+    elif query[0] == 'edit':
+        check_edit(conn, thread_id, query[1:])
+    elif query[0] == 'confirm':
+        confirm_edit(conn, thread_id, query[1])
+    elif query[0] == 'rollback':
+        rollback_edit(conn, thread_id)
+
+
+def rollback_edit(conn, thread_id):
+    try:
+        cell_id = list(busy_cells.keys())[list(busy_cells.values()).index(thread_id)]
+    except ValueError:
+        return
+    #cell_id = 10 * PAGE_SIZE * coords[0] + 10 * coords[1] + coords[2]
+
+    if busy_cells[cell_id] == thread_id:
+        del busy_cells[cell_id]
+        send_page(conn, clients_pages[thread_id])
+
+
+def confirm_edit(conn, thread_id, coords):  #
+    #print(coords)
+    try:
+        cell_id = list(busy_cells.keys())[list(busy_cells.values()).index(thread_id)]
+    except ValueError:
+        return
+
+    print(f'{cell_id=}')
+    print(f'{busy_cells=}')
+    print(f'{clients_pages=}')
+
+    #cell_id = 10 * PAGE_SIZE * coords[0] + 10 * coords[1] + coords[2]
+    if cell_id in busy_cells:
+        if busy_cells[cell_id] == thread_id:
+            del busy_cells[cell_id]
+            row = cell_id // row_size
+            col = cell_id % row_size
+            print(row, col)
+            print(data[0])
+            data[row][col] = coords
+            print(data[0])
+            broadcast_page(conn, clients_pages[thread_id])
+
+
+def check_edit(conn, thread_id, coords):  # проверяет, занята ли клетка: если не занята - занимает
+    print(coords)
+    cell_id = row_size * PAGE_SIZE * (coords[0]-1) + row_size * coords[1] + coords[2]
+    if cell_id not in busy_cells:
+        busy_cells[cell_id] = thread_id
+        broadcast_page(conn, coords[0])
+
+
+def broadcast_page(conn, page):  # отправляет страницу всем, кто на ней находится
+    rows_from = (page - 1) * PAGE_SIZE + 1
+    rows_to = page * PAGE_SIZE + 1
+    table = [data[0]]
+    table = table + data[rows_from:rows_to]
+    # print(table)
+
+    packed_table = pickle.dumps(table)
+    conn.sendall(packed_table)
+    print('Data sent')
+
+
+def send_page(conn, page):  # отправляет страницу одному клиенту в ответ на запрос
+
+    rows_from = (page - 1) * PAGE_SIZE + 1
+    rows_to = page * PAGE_SIZE + 1
+    header = data[0]
+    table = data[rows_from:rows_to]
+    print('table=', table)
+
+    in_edit = []
+    for key in busy_cells.keys():
+        key_page = key // (PAGE_SIZE * row_size)
+        key_row = key % (PAGE_SIZE * row_size) // row_size
+        key_col = key % row_size
+        if page - 1 == key_page:
+            in_edit.append((key_row, key_col))
+
+    print(f'{in_edit=}')
+
+    data_dict = {
+        'table': table,
+        'header': header,
+        'edit': in_edit,
+        'page_num': page,
+        'filename': FILENAME,
+        'page_size': PAGE_SIZE,
+        'row_size': row_size,
+    }
+
+    packed_data = pickle.dumps(data_dict)
+    conn.sendall(packed_data)
+    print('Data sent')
 
 
 def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
 
-    # the input is in bytes, so decode it
-    input_from_client_bytes = conn.recv(MAX_BUFFER_SIZE)
+    global number_of_pages
+    pages_num = pickle.dumps([number_of_pages])
+    conn.sendall(pages_num)
 
-    print('Test')
-    # MAX_BUFFER_SIZE is how big the message can be
-    # this is test.txt if it's sufficiently big
+    print(get_ident())
 
-    siz = sys.getsizeof(input_from_client_bytes)
-    if siz >= MAX_BUFFER_SIZE:
-        print("The length of input is probably too long: {}".format(siz))
+    while True:
+        # the input is in bytes, so decode it
+        try:
+            input_from_client_bytes = conn.recv(MAX_BUFFER_SIZE)
+        except:
+            break
 
-    # decode input and strip the end of line
-    input_from_client = input_from_client_bytes.decode("utf8").rstrip()
+        print('Test')
+        # MAX_BUFFER_SIZE is how big the message can be
+        # this is test.txt if it's sufficiently big
 
-    res = do_some_stuffs_with_input(input_from_client)
-    print("Result of processing {} is: {}".format(input_from_client, res))
+        siz = sys.getsizeof(input_from_client_bytes)
+        if siz >= MAX_BUFFER_SIZE:
+            print("The length of input is probably too long: {}".format(siz))
 
-    vysl = res.encode("utf8")  # encode the result string
-    conn.sendall(vysl)  # send it to client
+        # decode input and strip the end of line
+
+        input_from_client = pickle.loads(input_from_client_bytes)
+        print('Query = ', input_from_client)
+        process_query(conn, input_from_client, get_ident())
+
     conn.close()  # close connection
+    # delete busy_cells key
     print('Connection ' + ip + ':' + port + " ended")
 
 
 def start_server():
-
+    global data
+    global number_of_pages
     data = read_csv()
-    #print(data)
+    number_of_pages = len(data) // PAGE_SIZE + 1
+
+    print(f'Csv file read (pages: {number_of_pages}, columns: {row_size})')
 
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # this is for easy starting/killing the app
