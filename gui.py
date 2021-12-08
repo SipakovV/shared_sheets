@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import *
 from threading import Thread
-from time import sleep
+from time import sleep, perf_counter
 from queue import Queue
 import sys
 #test.txt srelgiuhsr
@@ -51,9 +51,6 @@ class App(tk.Frame):
         self.btn = tk.Button(master, text="Next page", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#a0a000', fg='#ffffff', width=10, command=self.get_next_page)
         self.btn.place(x=310, y=550)
-        self.btv = tk.Button(master, text="Enter", activebackground='#eeeeee', activeforeground='#000000',
-                             bg='#a0a000', fg='#ffffff', width=10, command=self.vvod_buttom)
-        self.btv.place(x=460, y=550)
 
         '''
         # таблица (command=self.edit_query заменить лямбда-функцией)
@@ -126,6 +123,7 @@ class App(tk.Frame):
 
     def edit_query(self, row: object, col: object) -> object:
         self.edited_cell = row, col
+        print(f'Time before sending: {perf_counter()}')
         self.send_to_master(['edit', self.page, row, col])
 
     def confirm_edit(self, event):
@@ -142,6 +140,8 @@ class App(tk.Frame):
         self.draw_page()
 
     def draw_page(self):
+        start_time = perf_counter()
+        print(f'Time before drawing: {start_time}')
         self.pred = [99,99]
         self.Flag = 0
         print('GUI got data ')
@@ -182,6 +182,9 @@ class App(tk.Frame):
                 j += 1
             i += 1
         self.Flag = 1
+        end_time = perf_counter()
+        execution_time = end_time - start_time
+        print(f'Drawing time: {execution_time}')
 
     def set_header(self, header):
         self.header = header
@@ -213,6 +216,7 @@ class GuiThread(Thread):
         self.app.master.title(data['filename'])
         self.app.set_row_size(data['row_size'])
         self.app.set_data(data['table'])
+
         #print(f'{data=}')
 
     def get_query(self):
