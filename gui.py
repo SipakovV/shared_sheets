@@ -10,7 +10,7 @@ import sys
 class App(tk.Frame):
 
     data = [["???" for y in range(10)] for x in range(10)]  #None # эту переменную выводите на экран
-    header = []
+    header = ["Series_reference", "Period", "Data_value", "Suppressed", "STATUS", "UNITS", "Magnitude", "Subject", "Group", "Series_title_1"]
     busy_cells = []
 
     max_pages = 1
@@ -33,6 +33,13 @@ class App(tk.Frame):
         # Set it to some value.
         #self.contents.set('this is a variable')
         
+        #заголовки
+        i = 0
+        while i < 10:
+            self.hdr = tk.Label(text=self.header[i])
+            self.hdr.place(x=10+(150*i),y=10)
+            i+=1
+        
         # кнопки управления страницами
         self.bt2 = tk.Button(master, text="Previous page", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#a0a000', fg='#ffffff', width=10, command=self.get_prev_page)
@@ -43,9 +50,9 @@ class App(tk.Frame):
         self.btn = tk.Button(master, text="Next page", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#a0a000', fg='#ffffff', width=10, command=self.get_next_page)
         self.btn.place(x=310, y=550)
-        self.btv = tk.Button(master, text="vvod", activebackground='#eeeeee', activeforeground='#000000',
+        self.btv = tk.Button(master, text="Enter", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#a0a000', fg='#ffffff', width=10, command=self.vvod_buttom)
-        self.btv.place(x=480, y=550)
+        self.btv.place(x=460, y=550)
 
         '''
         # таблица (command=self.edit_query заменить лямбда-функцией)
@@ -138,7 +145,13 @@ class App(tk.Frame):
         #print('GUI got data ', data)
         self.mass = [[tk.StringVar() for j in range(10)] for i in range(10)]
         # таблица в функции (command=self.edit_query заменить лямбда-функцией)
-
+        i = 0
+        while i < self.page_size:
+            j = 0
+            while j < self.row_size:
+                self.mass[i][j].trace("w", lambda name1, name2, op, x=i, y=j: self.test(x,y,name1,name2,op))
+                j += 1
+            i += 1
         i = 0
         while i < self.page_size:
             j = 0
@@ -180,6 +193,7 @@ class GuiThread(Thread):
         print('GUI thread started!')
         self.app = App()
         self.app.master.title('Window')
+        self.app.master.minsize(1800, 800)
         self.app.master.maxsize(1800, 800)
         self.app.mainloop()
         print('GUI thread ended!')
