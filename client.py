@@ -20,9 +20,13 @@ def listening_thread(soc, gui, MAX_BUFFER_SIZE = 4096):
     while True:
         try:
             result_data = get_data_from_server(soc)
+        except:
+            print('Error while getting data from server')
+            break
+        try:
             gui.output_data(result_data)
         except:
-            print('Error while getting data')
+            print('Error while data output to gui')
             break
 
 

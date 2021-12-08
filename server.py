@@ -100,7 +100,7 @@ def confirm_edit(conn, thread_id, coords):  #
             print(data[0])
             data[row][col] = coords
             print(data[0])
-            broadcast_page(conn, clients_pages[thread_id])
+            send_page(conn, clients_pages[thread_id])
 
 
 def check_edit(conn, thread_id, coords):  # проверяет, занята ли клетка: если не занята - занимает
@@ -108,7 +108,7 @@ def check_edit(conn, thread_id, coords):  # проверяет, занята л�
     cell_id = row_size * PAGE_SIZE * (coords[0]-1) + row_size * coords[1] + coords[2]
     if cell_id not in busy_cells:
         busy_cells[cell_id] = thread_id
-        broadcast_page(conn, coords[0])
+        send_page(conn, coords[0])
 
 
 def broadcast_page(conn, page):  # отправляет страницу всем, кто на ней находится
@@ -129,7 +129,7 @@ def send_page(conn, page):  # отправляет страницу одному
     rows_to = page * PAGE_SIZE + 1
     header = data[0]
     table = data[rows_from:rows_to]
-    print('table=', table)
+    #print('table=', table)
 
     in_edit = []
     for key in busy_cells.keys():
