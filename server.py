@@ -79,7 +79,7 @@ def rollback_edit(conn, thread_id):
         send_page(conn, clients_pages[thread_id])
 
 
-def confirm_edit(conn, thread_id, coords):  #
+def confirm_edit(conn, thread_id, confirmed_value):  #
     #print(coords)
     try:
         cell_id = list(busy_cells.keys())[list(busy_cells.values()).index(thread_id)]
@@ -96,10 +96,11 @@ def confirm_edit(conn, thread_id, coords):  #
             del busy_cells[cell_id]
             row = cell_id // row_size
             col = cell_id % row_size
-            print(row, col)
-            print(data[0])
-            data[row][col] = coords
-            print(data[0])
+            #print(row, col)
+            #print(data[0])
+            data[row][col] = confirmed_value
+            #print(data[0])
+            #broadcast_page(conn, clients_pages[thread_id], (row, col, confirmed_value))
             send_page(conn, clients_pages[thread_id])
 
 
@@ -111,15 +112,36 @@ def check_edit(conn, thread_id, coords):  # проверяет, занята л�
         send_page(conn, coords[0])
 
 
-def broadcast_page(conn, page):  # отправляет страницу всем, кто на ней находится
+def broadcast_page(conns, page, modified_cell):  # отправляет страницу всем, кто на ней находится
     rows_from = (page - 1) * PAGE_SIZE + 1
     rows_to = page * PAGE_SIZE + 1
-    table = [data[0]]
-    table = table + data[rows_from:rows_to]
-    # print(table)
+    header = data[0]
+    table = data[rows_from:rows_to]
+    # print('table=', table)
 
-    packed_table = pickle.dumps(table)
-    conn.sendall(packed_table)
+    in_edit = []
+    for key in busy_cells.keys():
+        key_page = key // (PAGE_SIZE * row_size)
+        key_row = key % (PAGE_SIZE * row_size) // row_size
+        key_col = key % row_size
+        if page - 1 == key_page:
+            in_edit.append((key_row, key_col))
+
+    print(f'{in_edit=}')
+
+    data_dict = {
+        'type': 'part',
+        'modified': [],
+        'header': header,
+        'edit': in_edit,
+        'page_num': page,
+        'filename': FILENAME,
+        'page_size': PAGE_SIZE,
+        'row_size': row_size,
+    }
+
+    packed_data = pickle.dumps(data_dict)
+    conn.sendall(packed_data)
     print('Data sent')
 
 
@@ -142,6 +164,7 @@ def send_page(conn, page):  # отправляет страницу одному
     print(f'{in_edit=}')
 
     data_dict = {
+        'type': 'full',
         'table': table,
         'header': header,
         'edit': in_edit,

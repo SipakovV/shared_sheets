@@ -56,7 +56,6 @@ def start_client():
 
     try:
         gui = GuiThread()
-
         gui.setDaemon(True)
         gui.start()
     except:
