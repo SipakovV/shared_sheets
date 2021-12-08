@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import *
 from threading import Thread
 from time import sleep
 from queue import Queue
@@ -42,6 +43,9 @@ class App(tk.Frame):
         self.btn = tk.Button(master, text="Next page", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#a0a000', fg='#ffffff', width=10, command=self.get_next_page)
         self.btn.place(x=310, y=550)
+        self.btv = tk.Button(master, text="vvod", activebackground='#eeeeee', activeforeground='#000000',
+                             bg='#a0a000', fg='#ffffff', width=10, command=self.vvod_buttom)
+        self.btv.place(x=480, y=550)
 
         '''
         # таблица (command=self.edit_query заменить лямбда-функцией)
@@ -72,10 +76,33 @@ class App(tk.Frame):
         self.entrythingy.bind('<Key-F3>', self.rollback_edit)
         self.entrythingy.bind('<Key-Return>', self.print_contents)
 
+    def vvod_buttom(self):
+        i = 0
+        while i < self.page_size:
+            j = 0
+            while j < self.row_size:
+                self.data[i][j] = self.mass[i][j].get()
+                j += 1
+            i += 1
+
+    def test(self, i, j, *args): #просто для теста
+        if (self.Flag == 1):
+            if ((self.pred[0] != i) or (self.pred[1] != j)):
+                '''
+                print("нажата ячейка " + str(i) + " " + str(j))
+                print("тут")
+                тут должна быть проверка доступности ячейки
+                '''
+                self.edit_query(i,j)
+
+
+                self.pred[0] = i
+                self.pred[1] = j
+
     def print_contents(self, event):
         print('The current entry content is:', self.contents.get())
 
-    def send_to_master(self, query):
+    def send_to_master(self, query: object) -> object:
         self.queue.put(query)
         print('send_to_master:', query)
 
@@ -90,7 +117,7 @@ class App(tk.Frame):
         self.page -= 1
         self.get_page_query()
 
-    def edit_query(self, row, col):
+    def edit_query(self, row: object, col: object) -> object:
         self.send_to_master(['edit', self.page, row, col])
 
     def confirm_edit(self, event):
@@ -105,22 +132,35 @@ class App(tk.Frame):
         self.draw_page()
 
     def draw_page(self):
+        self.pred = [99,99]
+        self.Flag = 0
         print('GUI got data ')
         #print('GUI got data ', data)
-
+        self.mass = [[tk.StringVar() for j in range(10)] for i in range(10)]
         # таблица в функции (command=self.edit_query заменить лямбда-функцией)
+
+        i = 0
+        while i < self.page_size:
+            j = 0
+            while j < self.row_size:
+                self.mass[i][j].trace("w", lambda name1, name2, op, x=i, y=j: self.test(x,y,name1,name2,op))
+                j += 1
+            i += 1
+
         i = 0
         while i < self.page_size:
             j = 0
             while j < self.row_size:
                 if j % 2 == 0:
-                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbbbff', fg='#000000', height=2, width=13, relief=tk.RIDGE, wraplength=140, command=self.edit_query)
+                    self.tab = tk.Entry(self.master, textvariable = self.mass[i][j], bg='white', fg='#000000', width=13)
+                    self.tab.insert(0, self.data[i][j])
                 else:
-                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbffbb', fg='#000000', height=2, width=13, relief=tk.RIDGE, wraplength=140, command=self.edit_query)
+                    self.tab = tk.Entry(self.master, textvariable = self.mass[i][j], bg='white', fg='#000000', width=13)
+                    self.tab.insert(0, self.data[i][j])
                 self.tab.place(x=10+(150*j), y=50+(50*i))
                 j += 1
             i += 1
-
+        self.Flag = 1
     def set_header(self, header):
         self.header = header
 
