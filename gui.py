@@ -93,15 +93,14 @@ class App(tk.Frame):
             i += 1
 
     def test(self, i, j, *args): #просто для теста
-        if (self.Flag == 1):
+        if self.Flag:
             if ((self.pred[0] != i) or (self.pred[1] != j)):
                 '''
                 print("нажата ячейка " + str(i) + " " + str(j))
                 print("тут")
                 тут должна быть проверка доступности ячейки
                 '''
-                self.edit_query(i,j)
-
+                self.edit_query(i, j)
 
                 self.pred[0] = i
                 self.pred[1] = j
@@ -169,7 +168,7 @@ class App(tk.Frame):
                 j += 1
             i += 1
         self.Flag = 1
-        
+
     def set_header(self, header):
         self.header = header
 
