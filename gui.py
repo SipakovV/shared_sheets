@@ -152,25 +152,18 @@ class App(tk.Frame):
                 self.mass[i][j].trace("w", lambda name1, name2, op, x=i, y=j: self.test(x,y,name1,name2,op))
                 j += 1
             i += 1
-        i = 0
-        while i < self.page_size:
-            j = 0
-            while j < self.row_size:
-                self.mass[i][j].trace("w", lambda name1, name2, op, x=i, y=j: self.test(x,y,name1,name2,op))
-                j += 1
-            i += 1
 
         i = 0
         while i < self.page_size:
             j = 0
             while j < self.row_size:
                 if j % 2 == 0:
-                    self.tab = tk.Entry(self.master, textvariable = self.mass[i][j], bg='white', fg='#000000', width=13)
+                    self.tab = tk.Entry(self.master, textvariable = self.mass[i][j], bg='#eeeeee', fg='#000000')
                     self.tab.insert(0, self.data[i][j])
                 else:
-                    self.tab = tk.Entry(self.master, textvariable = self.mass[i][j], bg='white', fg='#000000', width=13)
+                    self.tab = tk.Entry(self.master, textvariable = self.mass[i][j], bg='white', fg='#000000')
                     self.tab.insert(0, self.data[i][j])
-                self.tab.place(x=10+(150*j), y=50+(50*i))
+                self.tab.place(x=10+(150*j), y=50+(50*i), width=150, height=50)
                 j += 1
             i += 1
         self.Flag = 1
