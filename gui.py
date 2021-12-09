@@ -138,7 +138,8 @@ class App(tk.Frame):
     def confirm_edit(self):
         self.edited_cell = (99, 99)
         self.send_to_master(['confirm', self.cell_value])
-        self.draw_page()
+        #self.draw_page()
+        self.refresh()
 
     def rollback_edit(self):
         self.send_to_master(['rollback'])
@@ -146,7 +147,8 @@ class App(tk.Frame):
     def set_data(self, data):
         self.data = data
         #print('gui_data = ', self.data)
-        self.draw_page()
+        #self.draw_page()
+        self.refresh()
 
     def draw_page(self):
         start_time = perf_counter()
@@ -156,6 +158,8 @@ class App(tk.Frame):
         print('GUI got data ')
         #print('GUI got data ', data)
         self.mass = [[tk.StringVar() for j in range(10)] for i in range(10)]
+        self.tab = [[0 for j in range(10)] for i in range(10)]
+        self.vrbl = [[tk.StringVar() for j in range(10)] for i in range(10)]
         # таблица в функции (command=self.edit_query заменить лямбда-функцией)
         i = 0
         while i < self.page_size:
@@ -179,15 +183,17 @@ class App(tk.Frame):
                     cell_fg_color = '#000000'
 
                 coords = (i, j)
-
+                
                 if coords != self.edited_cell:
-                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground=cell_active_bg_color, activeforeground='#000000',
+                    print(self.data[i][j])
+                    #self.vrbl[i][j] = tk.StringVar(self.data[i][j])
+                    self.tab[i][j] = tk.Button(self.master, textvariable=self.vrbl[i][j], activebackground=cell_active_bg_color, activeforeground='#000000',
                              bg=cell_bg_color, fg=cell_fg_color, width=10, command=(lambda x=i, y=j: self.edit_query(x, y)))
                 else:
-                    self.tab = tk.Entry(self.master, textvariable=self.mass[i][j], bg=cell_bg_color, fg=cell_fg_color)
-                    self.tab.bind('<Key-Return>', self.confirm_edit)
-                    self.tab.insert(0, self.data[i][j])
-                self.tab.place(x=10+(150*j), y=50+(50*i), width=150, height=50)
+                    self.tab[i][j] = tk.Entry(self.master, textvariable=self.mass[i][j], bg=cell_bg_color, fg=cell_fg_color)
+                    self.tab[i][j].bind('<Key-Return>', self.confirm_edit)
+                    self.tab[i][j].insert(0, self.data[i][j])
+                self.tab[i][j].place(x=10+(150*j), y=50+(50*i), width=150, height=50)
                 j += 1
             i += 1
         self.Flag = 1
@@ -195,6 +201,17 @@ class App(tk.Frame):
         execution_time = end_time - start_time
         print(f'Drawing time: {execution_time}')
 
+    def refresh(self):
+        i = 0
+        while i < self.page_size:
+            j = 0
+            while j < self.page_size:
+                #self.data[i][j].set(self.mass[i][j])
+                self.tab[i][j].config(text=self.mass[i][j])
+                self.vrbl[i][j].set(self.data[i][j])
+                j+=1
+            i+=1
+    
     def set_header(self, header):
         self.header = header
 
