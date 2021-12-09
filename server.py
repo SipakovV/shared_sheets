@@ -19,6 +19,7 @@ busy_cells = {}
 clients_pages = {}
 client_threads = {}
 broadcast_messages = {}
+broadcast_indexes = {}
 
 data = []
 number_of_pages = 0
@@ -97,7 +98,7 @@ def read_csv():
     return data
 
 
-def process_query(conn, query, thread_id, broadcast_index):
+def process_query(conn, query, thread_id):
     print(f"Processing query {query[0]} from client {thread_id}")
     '''
     query_dict = {
@@ -112,9 +113,9 @@ def process_query(conn, query, thread_id, broadcast_index):
     #query_dict[query[0]]
     '''
     if query[0] == 'status':
-        if len(broadcast_messages) > broadcast_index:
+        if len(broadcast_messages) > broadcast_indexes[thread_id]:
             broadcast_index = len(broadcast_messages)
-            broadcast_status(conn, clients_pages[thread_id])
+            broadcast_status(conn, clients_pages[thread_id], thread_id)
     elif query[0] == 'get':
         clients_pages[thread_id] = query[1]
         print(f'{clients_pages=}')
@@ -136,7 +137,7 @@ def rollback_edit(conn, thread_id):
 
     if busy_cells[cell_id] == thread_id:
         del busy_cells[cell_id]
-        broadcast_messages[len(broadcast_messages)] = (None, clients_pages[thread_id], None, None)
+        #broadcast_messages[len(broadcast_messages)] = (None, clients_pages[thread_id], None, None)
         #broadcast_status(conn, clients_pages[thread_id])
         print(f'{broadcast_messages=}')
 
@@ -163,8 +164,9 @@ def confirm_edit(conn, thread_id, confirmed_value):  #
             data[row][col] = confirmed_value
             #print(data[0])
             #broadcast_page(conn, clients_pages[thread_id], (row, col, confirmed_value))
-
-            send_page(conn, clients_pages[thread_id])
+            broadcast_messages[len(broadcast_messages)] = (confirmed_value, clients_pages[thread_id], row, col)
+            print(f'{broadcast_messages=}')
+            #send_page(conn, clients_pages[thread_id])
 
 
 def check_edit(conn, thread_id, coords):  # проверяет, занята ли клетка: если не занята - занимает
@@ -172,18 +174,28 @@ def check_edit(conn, thread_id, coords):  # проверяет, занята л�
     cell_id = row_size * PAGE_SIZE * (coords[0]-1) + row_size * coords[1] + coords[2]
     if cell_id not in busy_cells:
         busy_cells[cell_id] = thread_id
-        broadcast_messages[len(broadcast_messages)] = (None, coords[0], coords[1], coords[2])
+        #broadcast_messages[len(broadcast_messages)] = (None, coords[0], coords[1], coords[2])
         print(f'{broadcast_messages=}')
         #send_page(conn, coords[0])
 
 
-def broadcast_status(conn, page, modified_cell=()):  # отправляет страницу всем, кто на ней находится
-    broadcast_index = 0
+def broadcast_status(conn, page, thread_id):  # отправляет страницу всем, кто на ней находится
+
+
     rows_from = (page - 1) * PAGE_SIZE + 1
     rows_to = page * PAGE_SIZE + 1
     header = data[0]
     table = data[rows_from:rows_to]
     # print('table=', table)
+
+    if broadcast_indexes[thread_id] < len(broadcast_messages):
+        broadcast_indexes[thread_id] += 1
+        message = broadcast_messages[broadcast_indexes[thread_id]]
+        if message[1] == page:
+            if message[0]:
+                modified_cell = (message[2], message[3], message[0])
+                print('CELL MODIFIED')
+
     print(f'{modified_cell=}')
 
     in_edit = []
@@ -252,7 +264,7 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
     pages_num = pickle.dumps([number_of_pages])
     conn.sendall(pages_num)
 
-    broadcast_index = 0
+    broadcast_indexes[get_ident()] = 0
 
     print(get_ident())
 
@@ -275,7 +287,7 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
 
         input_from_client = pickle.loads(input_from_client_bytes)
         print('Query = ', input_from_client)
-        process_query(conn, input_from_client, get_ident(), broadcast_index)
+        process_query(conn, input_from_client, get_ident())
 
     conn.close()  # close connection
     # delete busy_cells key
