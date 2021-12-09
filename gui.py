@@ -65,7 +65,10 @@ class App(tk.Frame):
         self.btn = tk.Button(master, text=">>>", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#a0a000', fg='#ffffff', width=13, command=self.confirm_edit)
         self.message_entry = Entry(self.master, textvariable=self.message, bg='#a0a000', fg='#ffffff')
+        self.message_entry.bind('<Key-Return>', self.confirm_edit_bind)
+        self.message_entry.bind('<Key-Escape>', self.rollback_edit_bind)
         self.message_entry.place(x=820, y=550, width=150, height=50)
+        self.message_entry.place_forget()
         self.btn.place(x=520, y=550, width=150, height=50)
         self.btn = tk.Button(master, text="Rollback", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#a0a000', fg='#ffffff', width=13, command=self.rollback_edit)
@@ -140,6 +143,8 @@ class App(tk.Frame):
         self.get_prev_page()
 
     def get_page_query(self):
+        self.message_entry.place_forget()
+        self.message_entry.delete(0, END)
         self.send_to_master(['get', self.page])
 
     def get_next_page(self):
@@ -151,6 +156,9 @@ class App(tk.Frame):
         self.get_page_query()
 
     def edit_query(self, row: object, col: object) -> object:
+        self.message_entry.place(x=820, y=550, width=150, height=50)
+        self.message_entry.delete(0, END)
+        self.message_entry.insert(0, self.vrbl[row][col].get())
         self.rollback_edit()
         self.edited_cell = row, col
         print(f'Time before sending: {perf_counter()}')
@@ -158,13 +166,22 @@ class App(tk.Frame):
 
     def confirm_edit(self):
         self.cell_value = self.message.get()
+        self.message_entry.place_forget()
+
         self.edited_cell = (99, 99)
         self.send_to_master(['confirm', self.cell_value])
         #self.draw_page()
         self.refresh()
 
+    def confirm_edit_bind(self, event):
+        self.confirm_edit()
+
     def rollback_edit(self):
         self.send_to_master(['rollback'])
+
+    def rollback_edit_bind(self, event):
+        self.message_entry.place_forget()
+        self.rollback_edit()
 
     def set_data(self, data):
         self.data = data
@@ -207,7 +224,7 @@ class App(tk.Frame):
                 coords = (i, j)
                 
                 if coords != self.edited_cell:
-                    print(self.data[i][j])
+                    #print(self.data[i][j])
                     #self.vrbl[i][j] = tk.StringVar(self.data[i][j])
                     self.tab[i][j] = tk.Button(self.master, textvariable=self.vrbl[i][j], activebackground=cell_active_bg_color, activeforeground='#000000',
                              bg=cell_bg_color, fg=cell_fg_color, width=10, command=(lambda x=i, y=j: self.edit_query(x, y)))
@@ -224,6 +241,7 @@ class App(tk.Frame):
         print(f'Drawing time: {execution_time}')
 
     def refresh(self):
+
         i = 0
         while i < self.page_size:
             j = 0
