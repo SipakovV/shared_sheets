@@ -37,8 +37,8 @@ class App(tk.Frame):
         #заголовки
         i = 0
         while i < 10:
-            self.hdr = tk.Label(text=self.header[i])
-            self.hdr.place(x=10+(150*i),y=10)
+            hdr = tk.Label(text=self.header[i])
+            hdr.place(x=10+(150*i),y=10)
             i+=1
         
         # кнопки управления страницами
