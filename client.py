@@ -27,6 +27,7 @@ def listening_thread(soc, gui, MAX_BUFFER_SIZE = 4096):
             gui.output_data(result_data)
         except:
             print('Error while data output to gui')
+            traceback.print_exc()
             break
 
 

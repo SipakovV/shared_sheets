@@ -27,7 +27,6 @@ class App(tk.Frame):
         self.message = StringVar()
         self.entrythingy = tk.Entry()
         #self.entrythingy.pack()
-
         # Create the application variable.
         #self.contents = tk.StringVar()
         # Set it to some value.
@@ -62,6 +61,7 @@ class App(tk.Frame):
         self.btn = tk.Button(master, text="Next page", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#a0a000', fg='#ffffff', width=13, command=self.get_next_page)
         self.btn.place(x=370, y=550, width=150, height=50)
+        self.btn.place_forget()
         '''
         self.btn = tk.Button(master, text=">>>", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#a0a000', fg='#ffffff', width=13, command=self.confirm_edit)
@@ -246,6 +246,8 @@ class App(tk.Frame):
                 self.message_entry.bind('<Key-Escape>', self.rollback_edit_bind)
                 self.message_entry.place(x=820, y=550, width=150, height=50)
                 self.message_entry.place_forget()
+
+
                 j += 1
             i += 1
         self.Flag = 1
@@ -265,6 +267,12 @@ class App(tk.Frame):
                 j += 1
             self.row_number[i].set((self.page-1)*self.page_size+i+1)
             i += 1
+        self.btn.place(x=370, y=550, width=150, height=50)
+        self.bt2.place(x=70, y=550, width=150, height=50)
+        if self.page == self.max_pages-1:
+            self.btn.place_forget()
+        if self.page == 1:
+            self.bt2.place_forget()
     
     def set_header(self, header):
         self.header = header
