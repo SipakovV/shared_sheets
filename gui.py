@@ -10,7 +10,6 @@ import sys
 class App(tk.Frame):
 
     data = [["???" for y in range(10)] for x in range(10)]  #None # эту переменную выводите на экран
-    header = ["Series_reference", "Period", "Data_value", "Suppressed", "STATUS", "UNITS", "Magnitude", "Subject", "Group", "Series_title_1"]
     busy_cells = []
 
     max_pages = 1
@@ -35,30 +34,40 @@ class App(tk.Frame):
         #self.contents.set('this is a variable')
         
         #заголовки
+        header = ["Series_reference", "Period", "Data_value", "Suppressed", "STATUS", "UNITS", "Magnitude", "Subject", "Group", "Series_title_1"]
         i = 0
-        while i < 10:
-            self.hdr = tk.Label(text=self.header[i])
-            self.hdr.place(x=10+(150*i),y=10)
+        while i < self.row_size:
+            self.hdr = tk.Label(text=header[i]) 
+            self.hdr.place(x=70+(150*i),y=20)
+            i+=1
+        
+        #нумерация строк
+        self.row_number = [tk.StringVar() for j in range(self.page_size)]
+        self.row_label = [None for j in range(self.page_size)]
+        i = 0
+        while i < self.page_size:
+            self.row_label[i] = tk.Label(textvariable=self.row_number[i])
+            self.row_label[i].place(x=0,y=63+(50*i))
             i+=1
         
         # кнопки управления страницами
         self.bt2 = tk.Button(master, text="Previous page", activebackground='#eeeeee', activeforeground='#000000',
-                             bg='#a0a000', fg='#ffffff', width=10, command=self.get_prev_page)
-        self.bt2.place(x=10, y=550)
+                             bg='#a0a000', fg='#ffffff', width=13, command=self.get_prev_page)
+        self.bt2.place(x=70, y=550, width=150, height=50)
         self.bt3 = tk.Button(master, text="Refresh", activebackground='#eeeeee', activeforeground='#000000',
-                             bg='#00a000', fg='#ffffff', width=10, command=self.get_page_query)
-        self.bt3.place(x=160, y=550)
+                             bg='#00a000', fg='#ffffff', width=13, command=self.get_page_query)
+        self.bt3.place(x=220, y=550, width=150, height=50)
         self.btn = tk.Button(master, text="Next page", activebackground='#eeeeee', activeforeground='#000000',
-                             bg='#a0a000', fg='#ffffff', width=10, command=self.get_next_page)
-        self.btn.place(x=310, y=550)
+                             bg='#a0a000', fg='#ffffff', width=13, command=self.get_next_page)
+        self.btn.place(x=370, y=550, width=150, height=50)
 
         self.btn = tk.Button(master, text="Confirm 5", activebackground='#eeeeee', activeforeground='#000000',
-                             bg='#a0a000', fg='#ffffff', width=10, command=self.confirm_edit)
-        self.btn.place(x=460, y=550)
+                             bg='#a0a000', fg='#ffffff', width=13, command=self.confirm_edit)
+        self.btn.place(x=520, y=550, width=150, height=50)
 
         self.btn = tk.Button(master, text="Rollback", activebackground='#eeeeee', activeforeground='#000000',
-                             bg='#a0a000', fg='#ffffff', width=10, command=self.rollback_edit)
-        self.btn.place(x=610, y=550)
+                             bg='#a0a000', fg='#ffffff', width=13, command=self.rollback_edit)
+        self.btn.place(x=670, y=550, width=150, height=50)
 
         '''
         # таблица (command=self.edit_query заменить лямбда-функцией)
@@ -157,9 +166,9 @@ class App(tk.Frame):
         self.Flag = 0
         print('GUI got data ')
         #print('GUI got data ', data)
-        self.mass = [[tk.StringVar() for j in range(10)] for i in range(10)]
-        self.tab = [[0 for j in range(10)] for i in range(10)]
-        self.vrbl = [[tk.StringVar() for j in range(10)] for i in range(10)]
+        self.mass = [[tk.StringVar() for j in range(self.row_size)] for i in range(self.page_size)]
+        self.tab = [[0 for j in range(self.row_size)] for i in range(self.page_size)]
+        self.vrbl = [[tk.StringVar() for j in range(self.row_size)] for i in range(self.page_size)]
         # таблица в функции (command=self.edit_query заменить лямбда-функцией)
         i = 0
         while i < self.page_size:
@@ -193,7 +202,7 @@ class App(tk.Frame):
                     self.tab[i][j] = tk.Entry(self.master, textvariable=self.mass[i][j], bg=cell_bg_color, fg=cell_fg_color)
                     self.tab[i][j].bind('<Key-Return>', self.confirm_edit)
                     self.tab[i][j].insert(0, self.data[i][j])
-                self.tab[i][j].place(x=10+(150*j), y=50+(50*i), width=150, height=50)
+                self.tab[i][j].place(x=70+(150*j), y=50+(50*i), width=150, height=50)
                 j += 1
             i += 1
         self.Flag = 1
@@ -207,9 +216,10 @@ class App(tk.Frame):
             j = 0
             while j < self.page_size:
                 #self.data[i][j].set(self.mass[i][j])
-                self.tab[i][j].config(text=self.mass[i][j])
+                #self.tab[i][j].set(text=self.mass[i][j])
                 self.vrbl[i][j].set(self.data[i][j])
                 j+=1
+            self.row_number[i].set((self.page-1)*self.page_size+i+1)
             i+=1
     
     def set_header(self, header):
@@ -236,8 +246,8 @@ class GuiThread(Thread):
         print('GUI thread started!')
         self.app = App()
         self.app.master.title('Window')
-        self.app.master.minsize(1800, 800)
-        self.app.master.maxsize(1800, 800)
+        self.app.master.minsize(1600, 600)
+        self.app.master.maxsize(1600, 600)
         self.app.mainloop()
         print('GUI thread ended!')
 
