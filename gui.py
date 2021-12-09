@@ -56,6 +56,10 @@ class App(tk.Frame):
                              bg='#a0a000', fg='#ffffff', width=10, command=self.confirm_edit)
         self.btn.place(x=460, y=550)
 
+        self.btn = tk.Button(master, text="Rollback", activebackground='#eeeeee', activeforeground='#000000',
+                             bg='#a0a000', fg='#ffffff', width=10, command=self.rollback_edit)
+        self.btn.place(x=460, y=550)
+
         '''
         # таблица (command=self.edit_query заменить лямбда-функцией)
         i = 0
@@ -135,7 +139,7 @@ class App(tk.Frame):
         self.send_to_master(['confirm', self.cell_value])
         self.draw_page()
 
-    def rollback_edit(self, event):
+    def rollback_edit(self):
         self.send_to_master(['rollback'])
 
     def set_data(self, data):

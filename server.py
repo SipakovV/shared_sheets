@@ -79,6 +79,7 @@ def update_all(page):
             thread.update_page(page)
 '''
 
+
 def read_csv():
     with open(FILENAME, newline='') as f:
         reader = csv.reader(f)
@@ -137,7 +138,9 @@ def rollback_edit(conn, thread_id):
 
     if busy_cells[cell_id] == thread_id:
         del busy_cells[cell_id]
-        broadcast_messages[len(broadcast_messages)] = (None, clients_pages[thread_id], coords[1], coords[2])
+        row = cell_id // row_size
+        col = cell_id % row_size
+        broadcast_messages[len(broadcast_messages)] = (None, clients_pages[thread_id], row, col)
         #broadcast_status(conn, clients_pages[thread_id])
         print(f'{broadcast_messages=}')
 
