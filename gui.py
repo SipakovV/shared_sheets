@@ -152,6 +152,7 @@ class App(tk.Frame):
         self.get_page_query()
 
     def edit_query(self, row: object, col: object) -> object:
+        self.cell_color_reset(self.edited_cell[0], self.edited_cell[1])
         self.edited_cell = row, col
         y = int(50 + (50 * self.edited_cell[0]))
         x = int(70 + (150 * self.edited_cell[1]))
@@ -181,9 +182,12 @@ class App(tk.Frame):
         self.confirm_edit()
 
     def rollback_edit(self):
+
+        #self.edited_cell = (99, 99)
         self.send_to_master(['rollback'])
 
     def rollback_edit_bind(self, event):
+        #self.cell_color_reset(edited_cell[0], edited_cell[1])
         self.message_entry.place_forget()
         self.rollback_edit()
 
@@ -258,6 +262,10 @@ class App(tk.Frame):
                 #self.data[i][j].set(self.mass[i][j])
                 #self.tab[i][j].set(text=self.mass[i][j])
                 self.vrbl[i][j].set(self.data[i][j])
+                #if (i, j) in self.busy_cells:
+                #    self.tab[i][j].config(bg="#aaaa22", activebackground="#bbbb33")
+                #    print('yellow colored', (i, j))
+                self.cell_color(i, j)
                 j += 1
             self.row_number[i].set((self.page-1)*self.page_size+i+1)
             i += 1
@@ -266,7 +274,15 @@ class App(tk.Frame):
         self.header = header
 
     def set_busy_cells(self, busy_cells):
-        self.busy_cells = busy_cells
+        if self.busy_cells != busy_cells:
+            for cell in self.busy_cells:
+                self.cell_color_reset(cell[0], cell[1])
+            self.busy_cells = busy_cells
+            print('busy: ', self.busy_cells)
+            for cell in self.busy_cells:
+                self.cell_color(cell[0], cell[1])
+
+    #def reset_busy_cells(self,
 
     def set_row_size(self, row_size):
         self.row_size = row_size
@@ -275,6 +291,37 @@ class App(tk.Frame):
         self.data[coords[0]][coords[1]] = coords[2]
         self.refresh()
         #self.update_cell(coords)
+
+    def cell_color(self, i, j):
+        if i >= self.page_size or j >= self.row_size:
+            return
+        if (i, j) in self.busy_cells:
+            print(f'i={i}, j={j}')
+            self.tab[i][j].config(bg="#d5d522", activebackground="#dddd33")
+            print('yellow colored', (i, j))
+        else:
+            if j % 2 == 0:
+                cell_bg_color = '#f0f0f0'
+                cell_active_bg_color = '#f5f5f5'
+                cell_fg_color = '#000000'
+            else:
+                cell_bg_color = '#f9f9f9'
+                cell_active_bg_color = '#ffffff'
+                cell_fg_color = '#000000'
+            self.tab[i][j].config(bg=cell_bg_color, activebackground=cell_active_bg_color)
+
+    def cell_color_reset(self, i, j):
+        if i >= self.page_size or j >= self.row_size:
+            return
+        if j % 2 == 0:
+            cell_bg_color = '#f0f0f0'
+            cell_active_bg_color = '#f5f5f5'
+            cell_fg_color = '#000000'
+        else:
+            cell_bg_color = '#f9f9f9'
+            cell_active_bg_color = '#ffffff'
+            cell_fg_color = '#000000'
+        self.tab[i][j].config(bg=cell_bg_color, activebackground=cell_active_bg_color)
 
 
 class GuiThread(Thread):
