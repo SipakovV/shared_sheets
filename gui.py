@@ -61,21 +61,15 @@ class App(tk.Frame):
         self.btn = tk.Button(master, text="Next page", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#a0a000', fg='#ffffff', width=13, command=self.get_next_page)
         self.btn.place(x=370, y=550, width=150, height=50)
-
+        '''
         self.btn = tk.Button(master, text=">>>", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#a0a000', fg='#ffffff', width=13, command=self.confirm_edit)
-        self.message_entry = Entry(self.master, textvariable=self.message, bg='#a0a000', fg='#ffffff')
-        self.message_entry.bind('<Key-Return>', self.confirm_edit_bind)
-        self.message_entry.bind('<Key-Escape>', self.rollback_edit_bind)
-        self.message_entry.place(x=820, y=550, width=150, height=50)
-        self.message_entry.place_forget()
+
         self.btn.place(x=520, y=550, width=150, height=50)
         self.btn = tk.Button(master, text="Rollback", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#a0a000', fg='#ffffff', width=13, command=self.rollback_edit)
         self.btn.place(x=670, y=550, width=150, height=50)
-
-
-        '''
+        
         # таблица (command=self.edit_query заменить лямбда-функцией)
         i = 0
         while i < self.page_size:
@@ -90,6 +84,8 @@ class App(tk.Frame):
             i += 1
         '''
         self.draw_page()
+        self.get_page_query()
+        self.refresh()
         
         # Tell the entry widget to watch this variable.
         #self.entrythingy['textvariable'] = self.contents
@@ -156,11 +152,19 @@ class App(tk.Frame):
         self.get_page_query()
 
     def edit_query(self, row: object, col: object) -> object:
-        self.message_entry.place(x=820, y=550, width=150, height=50)
+        self.edited_cell = row, col
+        y = int(50 + (50 * self.edited_cell[0]))
+        x = int(70 + (150 * self.edited_cell[1]))
+        print(x, y)
+
+        print(self.edited_cell)
         self.message_entry.delete(0, END)
         self.message_entry.insert(0, self.vrbl[row][col].get())
+        self.message_entry.place(x=x, y=y, width=150, height=50)
+        #self.message_entry.place(x=820, y=550, width=150, height=50)
+
         self.rollback_edit()
-        self.edited_cell = row, col
+
         print(f'Time before sending: {perf_counter()}')
         self.send_to_master(['edit', self.page, row, col])
 
@@ -233,6 +237,11 @@ class App(tk.Frame):
                     self.tab[i][j].bind('<Key-Return>', self.confirm_edit)
                     self.tab[i][j].insert(0, self.data[i][j])
                 self.tab[i][j].place(x=70+(150*j), y=50+(50*i), width=150, height=50)
+                self.message_entry = Entry(self.master, textvariable=self.message, bg='#a0a000', fg='#ffffff')
+                self.message_entry.bind('<Key-Return>', self.confirm_edit_bind)
+                self.message_entry.bind('<Key-Escape>', self.rollback_edit_bind)
+                self.message_entry.place(x=820, y=550, width=150, height=50)
+                self.message_entry.place_forget()
                 j += 1
             i += 1
         self.Flag = 1
@@ -249,9 +258,9 @@ class App(tk.Frame):
                 #self.data[i][j].set(self.mass[i][j])
                 #self.tab[i][j].set(text=self.mass[i][j])
                 self.vrbl[i][j].set(self.data[i][j])
-                j+=1
+                j += 1
             self.row_number[i].set((self.page-1)*self.page_size+i+1)
-            i+=1
+            i += 1
     
     def set_header(self, header):
         self.header = header
