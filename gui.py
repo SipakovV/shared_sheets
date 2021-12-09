@@ -91,9 +91,9 @@ class App(tk.Frame):
 
         # Define a callback for when the user hits return.
         # It prints the current value of the variable.
-        self.entrythingy.bind('<Key-F5>', self.get_page_query)
-        self.entrythingy.bind('<Key-F4>', self.get_prev_page)
-        self.entrythingy.bind('<Key-F6>', self.get_next_page)
+        self.master.bind('<Key-F5>', self.get_page_query_bind)
+        self.master.bind('<Key-F4>', self.get_prev_page_bind)
+        self.master.bind('<Key-F6>', self.get_next_page_bind)
         #self.entrythingy.bind('<Key-F1>', self.edit_query)
         #self.entrythingy.bind('<Key-F2>', self.confirm_edit)
         #self.entrythingy.bind('<Key-F3>', self.rollback_edit)
@@ -127,6 +127,15 @@ class App(tk.Frame):
     def send_to_master(self, query: object) -> object:
         self.queue.put(query)
         print('send_to_master:', query)
+
+    def get_page_query_bind(self, event):
+        self.get_page_query()
+
+    def get_next_page_bind(self, event):
+        self.get_next_page()
+
+    def get_prev_page_bind(self, event):
+        self.get_prev_page()
 
     def get_page_query(self):
         self.send_to_master(['get', self.page])
