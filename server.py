@@ -115,7 +115,7 @@ def process_query(conn, query, thread_id):
     '''
     if query[0] == 'status':
         if len(broadcast_messages) > broadcast_indexes[thread_id]:
-            broadcast_index = len(broadcast_messages)
+            #broadcast_indexes[thread_id] += 1
             broadcast_status(conn, clients_pages[thread_id], thread_id)
     elif query[0] == 'get':
         print(f'{busy_cells=}')
@@ -166,14 +166,14 @@ def confirm_edit(conn, thread_id, confirmed_value):  #
         if busy_cells[cell_id] == thread_id:
             del busy_cells[cell_id]
             page = cell_id // (PAGE_SIZE * row_size)
-            row = cell_id % (PAGE_SIZE * row_size) // row_size
+            row = cell_id % (PAGE_SIZE * row_size) // row_size + 1
             col = cell_id % row_size
             #print(row, col)
             #print(data[0])
             data[page*PAGE_SIZE+row][col] = confirmed_value
             #print(data[0])
             #broadcast_page(conn, clients_pages[thread_id], (row, col, confirmed_value))
-            broadcast_messages[len(broadcast_messages)] = (confirmed_value, clients_pages[thread_id], row, col)
+            broadcast_messages[len(broadcast_messages)] = (confirmed_value, clients_pages[thread_id], row-1, col)
             print(f'{broadcast_messages=}')
             #send_page(conn, clients_pages[thread_id])
 
