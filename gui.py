@@ -55,6 +55,7 @@ class App(tk.Frame):
         self.bt2 = tk.Button(master, text="Previous page", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#a0a000', fg='#ffffff', width=13, command=self.get_prev_page)
         self.bt2.place(x=70, y=550, width=150, height=50)
+        self.bt2.place_forget()
         self.bt3 = tk.Button(master, text="Refresh", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#00a000', fg='#ffffff', width=13, command=self.get_page_query)
         self.bt3.place(x=220, y=550, width=150, height=50)
@@ -150,6 +151,9 @@ class App(tk.Frame):
     def get_next_page(self):
         self.page += 1
         self.get_page_query()
+
+
+
 
     def get_prev_page(self):
         self.page -= 1
