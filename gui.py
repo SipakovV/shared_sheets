@@ -223,6 +223,7 @@ class App(tk.Frame):
 
     def set_modified_cell(self, coords):
         self.data[coords[0]][coords[1]] = coords[2]
+        self.refresh()
         #self.update_cell(coords)
 
 

@@ -118,7 +118,11 @@ def process_query(conn, query, thread_id):
             broadcast_index = len(broadcast_messages)
             broadcast_status(conn, clients_pages[thread_id], thread_id)
     elif query[0] == 'get':
+        print(f'{busy_cells=}')
         clients_pages[thread_id] = query[1]
+        if thread_id in busy_cells.values():
+            cell_id = list(busy_cells.keys())[list(busy_cells.values()).index(thread_id)]
+            del busy_cells[cell_id]
         print(f'{clients_pages=}')
         send_page(conn, query[1])
     elif query[0] == 'edit':
@@ -132,7 +136,8 @@ def process_query(conn, query, thread_id):
 def rollback_edit(conn, thread_id):
     try:
         cell_id = list(busy_cells.keys())[list(busy_cells.values()).index(thread_id)]
-    except ValueError:
+    except:
+        print('Error: busy_cell not found')
         return
     #cell_id = 10 * PAGE_SIZE * coords[0] + 10 * coords[1] + coords[2]
 
@@ -160,11 +165,12 @@ def confirm_edit(conn, thread_id, confirmed_value):  #
     if cell_id in busy_cells:
         if busy_cells[cell_id] == thread_id:
             del busy_cells[cell_id]
-            row = cell_id // row_size
+            page = cell_id // (PAGE_SIZE * row_size)
+            row = cell_id % (PAGE_SIZE * row_size) // row_size
             col = cell_id % row_size
             #print(row, col)
             #print(data[0])
-            data[row][col] = confirmed_value
+            data[page*PAGE_SIZE+row][col] = confirmed_value
             #print(data[0])
             #broadcast_page(conn, clients_pages[thread_id], (row, col, confirmed_value))
             broadcast_messages[len(broadcast_messages)] = (confirmed_value, clients_pages[thread_id], row, col)
