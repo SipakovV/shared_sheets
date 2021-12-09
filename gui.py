@@ -152,6 +152,9 @@ class App(tk.Frame):
         self.get_page_query()
 
     def edit_query(self, row: object, col: object) -> object:
+        if (row, col) in self.busy_cells:
+            return
+
         self.cell_color_reset(self.edited_cell[0], self.edited_cell[1])
         self.edited_cell = row, col
         y = int(50 + (50 * self.edited_cell[0]))
@@ -159,6 +162,7 @@ class App(tk.Frame):
         print(x, y)
 
         print(self.edited_cell)
+
         self.message_entry.delete(0, END)
         self.message_entry.insert(0, self.vrbl[row][col].get())
         self.message_entry.place(x=x, y=y, width=150, height=50)
