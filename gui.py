@@ -58,7 +58,7 @@ class App(tk.Frame):
 
         self.btn = tk.Button(master, text="Rollback", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#a0a000', fg='#ffffff', width=10, command=self.rollback_edit)
-        self.btn.place(x=460, y=550)
+        self.btn.place(x=610, y=550)
 
         '''
         # таблица (command=self.edit_query заменить лямбда-функцией)
@@ -130,6 +130,7 @@ class App(tk.Frame):
         self.get_page_query()
 
     def edit_query(self, row: object, col: object) -> object:
+        self.rollback_edit()
         self.edited_cell = row, col
         print(f'Time before sending: {perf_counter()}')
         self.send_to_master(['edit', self.page, row, col])

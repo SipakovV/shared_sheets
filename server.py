@@ -272,26 +272,31 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
 
     print(get_ident())
 
+
     while True:
-        # the input is in bytes, so decode it
         try:
-            input_from_client_bytes = conn.recv(MAX_BUFFER_SIZE)
+        # the input is in bytes, so decode it
+            try:
+                input_from_client_bytes = conn.recv(MAX_BUFFER_SIZE)
+            except:
+                break
+
+            #print('Test')
+            # MAX_BUFFER_SIZE is how big the message can be
+            # this is test.txt if it's sufficiently big
+
+            siz = sys.getsizeof(input_from_client_bytes)
+            if siz >= MAX_BUFFER_SIZE:
+                print("The length of input is probably too long: {}".format(siz))
+
+            # decode input and strip the end of line
+
+            input_from_client = pickle.loads(input_from_client_bytes)
+            print('Query = ', input_from_client)
+            process_query(conn, input_from_client, get_ident())
         except:
+            traceback.print_exc()
             break
-
-        #print('Test')
-        # MAX_BUFFER_SIZE is how big the message can be
-        # this is test.txt if it's sufficiently big
-
-        siz = sys.getsizeof(input_from_client_bytes)
-        if siz >= MAX_BUFFER_SIZE:
-            print("The length of input is probably too long: {}".format(siz))
-
-        # decode input and strip the end of line
-
-        input_from_client = pickle.loads(input_from_client_bytes)
-        print('Query = ', input_from_client)
-        process_query(conn, input_from_client, get_ident())
 
     conn.close()  # close connection
     # delete busy_cells key
