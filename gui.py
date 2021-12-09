@@ -128,7 +128,7 @@ class App(tk.Frame):
 
     def send_to_master(self, query: object) -> object:
         self.queue.put(query)
-        print('send_to_master:', query)
+        #print('send_to_master:', query)
 
     def get_page_query_bind(self, event):
         self.get_page_query()
@@ -147,9 +147,6 @@ class App(tk.Frame):
     def get_next_page(self):
         self.page += 1
         self.get_page_query()
-
-
-
 
     def get_prev_page(self):
         self.page -= 1
@@ -174,7 +171,7 @@ class App(tk.Frame):
 
         self.rollback_edit()
 
-        print(f'Time before sending: {perf_counter()}')
+        #print(f'Time before sending: {perf_counter()}')
         self.send_to_master(['edit', self.page, row, col])
 
     def confirm_edit(self):
@@ -207,7 +204,7 @@ class App(tk.Frame):
 
     def draw_page(self):
         start_time = perf_counter()
-        print(f'Time before drawing: {start_time}')
+        #print(f'Time before drawing: {start_time}')
         self.pred = [99,99]
         self.Flag = 0
         print('GUI got data ')
@@ -250,6 +247,7 @@ class App(tk.Frame):
                     self.tab[i][j].insert(0, self.data[i][j])
                 self.tab[i][j].place(x=70+(150*j), y=50+(50*i), width=150, height=50)
                 self.message_entry = Entry(self.master, textvariable=self.message, bg='#a0a000', fg='#ffffff')
+                self.message_entry.config(bg='#ffffff', fg='#000000')
                 self.message_entry.bind('<Key-Return>', self.confirm_edit_bind)
                 self.message_entry.bind('<Key-Escape>', self.rollback_edit_bind)
                 self.message_entry.place(x=820, y=550, width=150, height=50)
@@ -312,9 +310,9 @@ class App(tk.Frame):
         if i >= self.page_size or j >= self.row_size:
             return
         if (i, j) in self.busy_cells:
-            print(f'i={i}, j={j}')
+            #print(f'i={i}, j={j}')
             self.tab[i][j].config(bg="#d5d522", activebackground="#dddd33")
-            print('yellow colored', (i, j))
+            #print('yellow colored', (i, j))
         else:
             if j % 2 == 0:
                 cell_bg_color = '#f0f0f0'

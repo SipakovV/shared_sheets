@@ -22,6 +22,7 @@ def listening_thread(soc, gui, MAX_BUFFER_SIZE = 4096):
             result_data = get_data_from_server(soc)
         except:
             print('Error while getting data from server')
+            traceback.print_exc()
             break
         try:
             gui.output_data(result_data)
@@ -49,7 +50,7 @@ def send_status_query(soc):
 def get_data_from_server(soc):
     result_bytes = soc.recv(4096)  # the number means how the response can be in bytes
     result_data = pickle.loads(result_bytes)
-    print(result_data)
+    #print(result_data)
     return result_data
 
 
