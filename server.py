@@ -137,7 +137,7 @@ def rollback_edit(conn, thread_id):
 
     if busy_cells[cell_id] == thread_id:
         del busy_cells[cell_id]
-        #broadcast_messages[len(broadcast_messages)] = (None, clients_pages[thread_id], None, None)
+        broadcast_messages[len(broadcast_messages)] = (None, clients_pages[thread_id], coords[1], coords[2])
         #broadcast_status(conn, clients_pages[thread_id])
         print(f'{broadcast_messages=}')
 
@@ -174,7 +174,7 @@ def check_edit(conn, thread_id, coords):  # проверяет, занята л�
     cell_id = row_size * PAGE_SIZE * (coords[0]-1) + row_size * coords[1] + coords[2]
     if cell_id not in busy_cells:
         busy_cells[cell_id] = thread_id
-        #broadcast_messages[len(broadcast_messages)] = (None, coords[0], coords[1], coords[2])
+        broadcast_messages[len(broadcast_messages)] = (None, coords[0], coords[1], coords[2])
         print(f'{broadcast_messages=}')
         #send_page(conn, coords[0])
 
@@ -187,10 +187,11 @@ def broadcast_status(conn, page, thread_id):  # отправляет стран�
     header = data[0]
     table = data[rows_from:rows_to]
     # print('table=', table)
+    modified_cell = ()
 
-    if broadcast_indexes[thread_id] < len(broadcast_messages):
-        broadcast_indexes[thread_id] += 1
+    if broadcast_indexes[thread_id] < len(broadcast_messages)+1:
         message = broadcast_messages[broadcast_indexes[thread_id]]
+        broadcast_indexes[thread_id] += 1
         if message[1] == page:
             if message[0]:
                 modified_cell = (message[2], message[3], message[0])
