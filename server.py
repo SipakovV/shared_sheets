@@ -25,6 +25,9 @@ data = []
 number_of_pages = 0
 row_size = 0
 
+global something
+something = "something"
+
 '''
 class ClientThread(Thread):
 
@@ -80,6 +83,12 @@ def update_all(page):
 '''
 
 
+def write_csv(row, something):
+    with open(FILENAME, newline=''):
+        data.insert(row, something)
+    return data
+
+
 def read_csv():
     with open(FILENAME, newline='') as f:
         reader = csv.reader(f)
@@ -97,6 +106,8 @@ def read_csv():
         except csv.Error as e:
             sys.exit('file {}, line {}: {}'.format(FILENAME, reader.line_num, e))
     return data
+
+
 
 
 def process_query(conn, query, thread_id):
