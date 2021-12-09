@@ -25,8 +25,6 @@ data = []
 number_of_pages = 0
 row_size = 0
 
-global something
-something = "something"
 
 '''
 class ClientThread(Thread):
@@ -83,10 +81,11 @@ def update_all(page):
 '''
 
 
-def write_csv(row, something):
-    with open(FILENAME, newline=''):
-        data.insert(row, something)
-    return data
+def write_csv():
+    with open(FILENAME, "w", newline='') as f:
+        #data.insert(row, some_thing)
+        writer = csv.writer(f)
+        writer.writerows(data)
 
 
 def read_csv():
@@ -103,6 +102,7 @@ def read_csv():
                 #i -= 1
                 #if i < 0:
                 #    break
+            f.close()
         except csv.Error as e:
             sys.exit('file {}, line {}: {}'.format(FILENAME, reader.line_num, e))
     return data
@@ -187,6 +187,7 @@ def confirm_edit(conn, thread_id, confirmed_value):  #
             broadcast_messages[len(broadcast_messages)] = (confirmed_value, clients_pages[thread_id], row-1, col)
             print(f'{broadcast_messages=}')
             #send_page(conn, clients_pages[thread_id])
+            write_csv()
 
 
 def check_edit(conn, thread_id, coords):  # проверяет, занята ли клетка: если не занята - занимает
@@ -324,6 +325,7 @@ def start_server():
     global data
     global number_of_pages
     data = read_csv()
+    write_csv()
     number_of_pages = len(data) // PAGE_SIZE + 1
 
     print(f'Csv file read (pages: {number_of_pages}, columns: {row_size})')
