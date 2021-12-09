@@ -3,3 +3,5 @@
 /old
 .~lock.*
 test.py
+data.csv
+*.csv
