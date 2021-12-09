@@ -24,7 +24,7 @@ class App(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.pack()
-
+        self.message = StringVar()
         self.entrythingy = tk.Entry()
         #self.entrythingy.pack()
 
@@ -62,13 +62,15 @@ class App(tk.Frame):
                              bg='#a0a000', fg='#ffffff', width=13, command=self.get_next_page)
         self.btn.place(x=370, y=550, width=150, height=50)
 
-        self.btn = tk.Button(master, text="Confirm 5", activebackground='#eeeeee', activeforeground='#000000',
+        self.btn = tk.Button(master, text=">>>", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#a0a000', fg='#ffffff', width=13, command=self.confirm_edit)
+        self.message_entry = Entry(self.master, textvariable=self.message, bg='#a0a000', fg='#ffffff')
+        self.message_entry.place(x=820, y=550, width=150, height=50)
         self.btn.place(x=520, y=550, width=150, height=50)
-
         self.btn = tk.Button(master, text="Rollback", activebackground='#eeeeee', activeforeground='#000000',
                              bg='#a0a000', fg='#ffffff', width=13, command=self.rollback_edit)
         self.btn.place(x=670, y=550, width=150, height=50)
+
 
         '''
         # таблица (command=self.edit_query заменить лямбда-функцией)
@@ -155,6 +157,7 @@ class App(tk.Frame):
         self.send_to_master(['edit', self.page, row, col])
 
     def confirm_edit(self):
+        self.cell_value = self.message.get()
         self.edited_cell = (99, 99)
         self.send_to_master(['confirm', self.cell_value])
         #self.draw_page()
