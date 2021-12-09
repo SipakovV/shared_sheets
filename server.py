@@ -325,7 +325,6 @@ def start_server():
     global data
     global number_of_pages
     data = read_csv()
-    write_csv()
     number_of_pages = len(data) // PAGE_SIZE + 1
 
     print(f'Csv file read (pages: {number_of_pages}, columns: {row_size})')
