@@ -1,7 +1,7 @@
 # server.py
 import socket
 import sys
-from threading import Thread, get_ident
+from threading import Thread, get_ident, enumerate
 import traceback
 import tkinter as tk
 from time import sleep
@@ -13,14 +13,70 @@ from gui import App
 
 FILENAME = 'data.csv'
 PAGE_SIZE = 10
+MAX_BUFFER_SIZE = 4096
 
 busy_cells = {}
 clients_pages = {}
+client_threads = {}
+broadcast_messages = {}
 
 data = []
 number_of_pages = 0
 row_size = 0
 
+'''
+class ClientThread(Thread):
+
+    def __init__(self, conn, ip, port):
+        Thread.__init__(self)
+        self.conn = conn
+        self.ip = ip
+        self.port = port
+
+    def run(self):
+        global number_of_pages
+        pages_num = pickle.dumps([number_of_pages])
+        self.conn.sendall(pages_num)
+
+        print(get_ident())
+
+        while True:
+            # the input is in bytes, so decode it
+            try:
+                input_from_client_bytes = conn.recv(MAX_BUFFER_SIZE)
+            except:
+                print('Got trash from client')
+                break
+
+            print('Test')
+            # MAX_BUFFER_SIZE is how big the message can be
+            # this is test.txt if it's sufficiently big
+
+            siz = sys.getsizeof(input_from_client_bytes)
+            if siz >= MAX_BUFFER_SIZE:
+                print("The length of input is probably too long: {}".format(siz))
+
+            # decode input and strip the end of line
+
+            input_from_client = pickle.loads(input_from_client_bytes)
+            print('Query = ', input_from_client)
+            process_query(conn, input_from_client, get_ident())
+
+        self.conn.close()  # close connection
+        # delete busy_cells key
+        print('Connection ' + self.ip + ':' + self.port + " ended")
+
+    def update_page(self, page):
+        print('Update page at thread #', get_ident())
+
+    #def handle_connection(self, conn, ip, port):
+
+
+def update_all(page):
+    for thread in enumerate():
+        if thread is ClientThread:
+            thread.update_page(page)
+'''
 
 def read_csv():
     with open(FILENAME, newline='') as f:
@@ -41,7 +97,7 @@ def read_csv():
     return data
 
 
-def process_query(conn, query, thread_id):
+def process_query(conn, query, thread_id, broadcast_index):
     print(f"Processing query {query[0]} from client {thread_id}")
     '''
     query_dict = {
@@ -55,7 +111,11 @@ def process_query(conn, query, thread_id):
     #print(conn, type(conn))
     #query_dict[query[0]]
     '''
-    if query[0] == 'get':
+    if query[0] == 'status':
+        if len(broadcast_messages) > broadcast_index:
+            broadcast_index = len(broadcast_messages)
+            broadcast_status(conn, clients_pages[thread_id])
+    elif query[0] == 'get':
         clients_pages[thread_id] = query[1]
         print(f'{clients_pages=}')
         send_page(conn, query[1])
@@ -76,7 +136,9 @@ def rollback_edit(conn, thread_id):
 
     if busy_cells[cell_id] == thread_id:
         del busy_cells[cell_id]
-        send_page(conn, clients_pages[thread_id])
+        broadcast_messages[len(broadcast_messages)] = (None, clients_pages[thread_id], None, None)
+        #broadcast_status(conn, clients_pages[thread_id])
+        print(f'{broadcast_messages=}')
 
 
 def confirm_edit(conn, thread_id, confirmed_value):  #
@@ -101,6 +163,7 @@ def confirm_edit(conn, thread_id, confirmed_value):  #
             data[row][col] = confirmed_value
             #print(data[0])
             #broadcast_page(conn, clients_pages[thread_id], (row, col, confirmed_value))
+
             send_page(conn, clients_pages[thread_id])
 
 
@@ -109,15 +172,19 @@ def check_edit(conn, thread_id, coords):  # проверяет, занята л�
     cell_id = row_size * PAGE_SIZE * (coords[0]-1) + row_size * coords[1] + coords[2]
     if cell_id not in busy_cells:
         busy_cells[cell_id] = thread_id
-        send_page(conn, coords[0])
+        broadcast_messages[len(broadcast_messages)] = (None, coords[0], coords[1], coords[2])
+        print(f'{broadcast_messages=}')
+        #send_page(conn, coords[0])
 
 
-def broadcast_page(conns, page, modified_cell):  # отправляет страницу всем, кто на ней находится
+def broadcast_status(conn, page, modified_cell=()):  # отправляет страницу всем, кто на ней находится
+    broadcast_index = 0
     rows_from = (page - 1) * PAGE_SIZE + 1
     rows_to = page * PAGE_SIZE + 1
     header = data[0]
     table = data[rows_from:rows_to]
     # print('table=', table)
+    print(f'{modified_cell=}')
 
     in_edit = []
     for key in busy_cells.keys():
@@ -131,7 +198,7 @@ def broadcast_page(conns, page, modified_cell):  # отправляет стра
 
     data_dict = {
         'type': 'part',
-        'modified': [],
+        'modified': modified_cell,
         'header': header,
         'edit': in_edit,
         'page_num': page,
@@ -142,7 +209,7 @@ def broadcast_page(conns, page, modified_cell):  # отправляет стра
 
     packed_data = pickle.dumps(data_dict)
     conn.sendall(packed_data)
-    print('Data sent')
+    print('Status sent')
 
 
 def send_page(conn, page):  # отправляет страницу одному клиенту в ответ на запрос
@@ -185,6 +252,8 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
     pages_num = pickle.dumps([number_of_pages])
     conn.sendall(pages_num)
 
+    broadcast_index = 0
+
     print(get_ident())
 
     while True:
@@ -194,7 +263,7 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
         except:
             break
 
-        print('Test')
+        #print('Test')
         # MAX_BUFFER_SIZE is how big the message can be
         # this is test.txt if it's sufficiently big
 
@@ -206,7 +275,7 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
 
         input_from_client = pickle.loads(input_from_client_bytes)
         print('Query = ', input_from_client)
-        process_query(conn, input_from_client, get_ident())
+        process_query(conn, input_from_client, get_ident(), broadcast_index)
 
     conn.close()  # close connection
     # delete busy_cells key
@@ -242,11 +311,23 @@ def start_server():
     # this will make an infinite loop needed for
     # not resetting server for every client
     while True:
+        print('Before accept')
         conn, addr = soc.accept()
+        print('After accept')
         ip, port = str(addr[0]), str(addr[1])
         print('Accepting connection from ' + ip + ':' + port)
         try:
             Thread(target=client_thread, args=(conn, ip, port), daemon=True).start()
+
+            #client_threads[(ip, port)] = ClientThread(conn, ip, port)
+            #client_threads[(ip, port)].handle_connection(conn, ip, port)
+            #client_threads[(ip, port)].setDaemon(True)
+            #client_threads[(ip, port)].start()
+            for thread in enumerate():
+                print(f'hello from thread {thread}')
+            #update_all(1)
+            #client_threads[(ip, port)].update_page(1)
+
         except:
             print("Terrible error!")
             traceback.print_exc()

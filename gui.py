@@ -52,6 +52,10 @@ class App(tk.Frame):
                              bg='#a0a000', fg='#ffffff', width=10, command=self.get_next_page)
         self.btn.place(x=310, y=550)
 
+        self.btn = tk.Button(master, text="Confirm 5", activebackground='#eeeeee', activeforeground='#000000',
+                             bg='#a0a000', fg='#ffffff', width=10, command=self.confirm_edit)
+        self.btn.place(x=460, y=550)
+
         '''
         # таблица (command=self.edit_query заменить лямбда-функцией)
         i = 0
@@ -126,7 +130,7 @@ class App(tk.Frame):
         print(f'Time before sending: {perf_counter()}')
         self.send_to_master(['edit', self.page, row, col])
 
-    def confirm_edit(self, event):
+    def confirm_edit(self):
         self.edited_cell = (99, 99)
         self.send_to_master(['confirm', self.cell_value])
         self.draw_page()
@@ -195,6 +199,10 @@ class App(tk.Frame):
     def set_row_size(self, row_size):
         self.row_size = row_size
 
+    def set_modified_cell(self, coords):
+        self.data[coords[0]][coords[1]] = coords[2]
+        #self.update_cell(coords)
+
 
 class GuiThread(Thread):
 
@@ -211,11 +219,16 @@ class GuiThread(Thread):
         print('GUI thread ended!')
 
     def output_data(self, data):
-        self.app.set_header(data['header'])
-        self.app.set_busy_cells(data['edit'])
-        self.app.master.title(data['filename'])
-        self.app.set_row_size(data['row_size'])
-        self.app.set_data(data['table'])
+        if data['type'] == 'full':
+            self.app.set_header(data['header'])
+            self.app.set_busy_cells(data['edit'])
+            self.app.master.title(data['filename'])
+            self.app.set_row_size(data['row_size'])
+            self.app.set_data(data['table'])
+        elif data['type'] == 'part':
+            self.app.set_busy_cells(data['edit'])
+            if data['modified']:
+                self.app.set_modified_cell(data['modified'])
 
         #print(f'{data=}')
 

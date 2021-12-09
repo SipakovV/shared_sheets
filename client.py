@@ -39,6 +39,12 @@ def send_query(query, soc):
     soc.send(packed_query)
 
 
+def send_status_query(soc):
+    query = ['status']
+    packed_query = pickle.dumps(query)
+    soc.send(packed_query)
+
+
 def get_data_from_server(soc):
     result_bytes = soc.recv(4096)  # the number means how the response can be in bytes
     result_data = pickle.loads(result_bytes)
@@ -81,7 +87,8 @@ def start_client():
             print('query = ', query)
             send_query(query, soc)
 
-        sleep(0.05)
+        sleep(0.1)
+        send_status_query(soc)
         if not gui.is_alive():
             break
 
