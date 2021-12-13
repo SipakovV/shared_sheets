@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import *
 from threading import Thread
-from time import perf_counter
+from time import perf_counter, sleep
 from queue import Queue
 
 MAX_BUFFER_SIZE = 4096
@@ -40,7 +40,7 @@ class App(tk.Frame):
         i = 0
         while i < self.page_size:
             self.row_label[i] = tk.Label(textvariable=self.row_number[i])
-            self.row_label[i].place(x=0,y=63+(50*i))
+            self.row_label[i].place(x=0, y=63+(50*i))
             i += 1
         
         # кнопки управления страницами
@@ -56,7 +56,8 @@ class App(tk.Frame):
         self.btn.place(x=370, y=550, width=150, height=50)
         self.btn.place_forget()
         self.draw_page()
-        self.get_page_query()
+        #sleep(0.3)
+        self.send_to_master(['get', self.page])
         self.refresh()
         self.master.bind('<Key-F5>', self.get_page_query_bind)
         self.master.bind('<Key-F4>', self.get_prev_page_bind)

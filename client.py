@@ -16,7 +16,7 @@ queue_to_gui = Queue()
 queue_from_gui = Queue()
 
 
-def listening_thread(soc, gui, MAX_BUFFER_SIZE = 4096):
+def listening_thread(soc, gui, MAX_BUFFER_SIZE = 4096):  # поток, обрабатывающий пакеты с сервера
     while True:
         try:
             result_data = get_data_from_server(soc)
@@ -32,16 +32,16 @@ def listening_thread(soc, gui, MAX_BUFFER_SIZE = 4096):
             break
 
 
-def get_query(gui):
+def get_query(gui):  # получение запроса от интерфейса
     return gui.get_query()
 
 
-def send_query(query, soc):
+def send_query(query, soc):  # отправка запроса серверу
     packed_query = pickle.dumps(query)
     soc.send(packed_query)
 
 
-def send_status_query(soc):
+def send_status_query(soc):  #
     query = ['status']
     packed_query = pickle.dumps(query)
     soc.send(packed_query)

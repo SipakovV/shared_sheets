@@ -192,7 +192,7 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):  # поток, обр
             input_from_client = pickle.loads(input_from_client_bytes)
             process_query(conn, input_from_client, get_ident())
         except:
-            traceback.print_exc()
+            #traceback.print_exc()
             break
 
     if get_ident() in busy_cells.values():
@@ -225,16 +225,20 @@ def start_server():  # запуск сервера
     print(f'Socket now listening at {ADDRESS[0]}:{ADDRESS[1]}')
 
     while True:
-        conn, addr = soc.accept()
-        ip, port = str(addr[0]), str(addr[1])
-        print('Accepting connection from ' + ip + ':' + port)
         try:
-            Thread(target=client_thread, args=(conn, ip, port), daemon=True).start()
-            for thread in enumerate():
-                print(f'Hello from thread {thread}')
-        except:
-            print("Terrible error!")
-            traceback.print_exc()
+            conn, addr = soc.accept()
+            ip, port = str(addr[0]), str(addr[1])
+            print('Accepting connection from ' + ip + ':' + port)
+            try:
+                Thread(target=client_thread, args=(conn, ip, port), daemon=True).start()
+                for thread in enumerate():
+                    print(f'Hello from thread {thread}')
+            except:
+                print("Terrible error!")
+                traceback.print_exc()
+        except KeyboardInterrupt:
+            print("Server stopped")
+            return 
 
 
 if __name__ == '__main__':
