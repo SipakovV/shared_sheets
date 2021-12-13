@@ -8,6 +8,8 @@ import pickle
 
 from gui import App, GuiThread
 
+SERVER_ADDRESS = ("127.0.0.1", 12345)
+
 data = []
 
 queue_to_gui = Queue()
@@ -69,7 +71,7 @@ def start_client():
     sleep(1)
 
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    soc.connect(('127.0.0.1', 12345))
+    soc.connect(SERVER_ADDRESS)
 
     get_number_of_pages(soc, gui)
 
