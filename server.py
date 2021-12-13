@@ -175,7 +175,7 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):  # поток, обр
     global number_of_pages
     pages_num = pickle.dumps([number_of_pages])
     conn.sendall(pages_num)
-    broadcast_indexes[get_ident()] = 0
+    broadcast_indexes[get_ident()] = len(broadcast_messages)
     clients_pages[get_ident()] = 1
 
     while True:
