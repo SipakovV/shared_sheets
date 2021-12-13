@@ -1,10 +1,8 @@
 # client.py
 import socket
-import sys
 import traceback
 from threading import Thread
 from time import sleep
-import pickle
 from queue import Queue
 import pickle
 
@@ -50,7 +48,6 @@ def send_status_query(soc):
 def get_data_from_server(soc):
     result_bytes = soc.recv(4096)  # the number means how the response can be in bytes
     result_data = pickle.loads(result_bytes)
-    #print(result_data)
     return result_data
 
 
@@ -61,7 +58,6 @@ def get_number_of_pages(soc, gui):
 
 
 def start_client():
-
     try:
         gui = GuiThread()
         gui.setDaemon(True)
@@ -93,15 +89,6 @@ def start_client():
         send_status_query(soc)
         if not gui.is_alive():
             break
-
-    """
-    clients_input = input('What you want to proceed my dear client?\n')
-    soc.send(clients_input.encode('utf8'))  # we must encode the string to bytes
-    result_bytes = soc.recv(4096)  # the number means how the response can be in bytes
-
-    result_data = pickle.loads(result_bytes)
-    gui.output_data(result_data)
-    """
 
 
 if __name__ == '__main__':
