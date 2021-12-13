@@ -1,15 +1,15 @@
 import tkinter as tk
 from tkinter import *
 from threading import Thread
-from time import sleep, perf_counter
+from time import perf_counter
 from queue import Queue
-import sys
-#test.txt srelgiuhsr
+
+
 
 
 class App(tk.Frame):
 
-    data = [["???" for y in range(10)] for x in range(10)]  #None # эту переменную выводите на экран
+    data = [["???" for y in range(10)] for x in range(10)]  #None эту переменную выводите на экран
     busy_cells = []
 
     max_pages = 1
@@ -26,11 +26,7 @@ class App(tk.Frame):
         self.pack()
         self.message = StringVar()
         self.entrythingy = tk.Entry()
-        #self.entrythingy.pack()
-        # Create the application variable.
-        #self.contents = tk.StringVar()
-        # Set it to some value.
-        #self.contents.set('this is a variable')
+
         
         #заголовки
         header = ["Series_reference", "Period", "Data_value", "Suppressed", "STATUS", "UNITS", "Magnitude", "Subject", "Group", "Series_title_1"]
@@ -39,7 +35,7 @@ class App(tk.Frame):
         while i < self.row_size:
             hdr = tk.Label(text=header[i])
             hdr.place(x=70+(150*i),y=20)
-            i+=1
+            i += 1
         
         #нумерация строк
         self.row_number = [tk.StringVar() for j in range(self.page_size)]
@@ -48,7 +44,7 @@ class App(tk.Frame):
         while i < self.page_size:
             self.row_label[i] = tk.Label(textvariable=self.row_number[i])
             self.row_label[i].place(x=0,y=63+(50*i))
-            i+=1
+            i += 1
         
         # кнопки управления страницами
         self.bt2 = tk.Button(master, text="Previous page", activebackground='#eeeeee', activeforeground='#000000',
@@ -62,44 +58,12 @@ class App(tk.Frame):
                              bg='#a0a000', fg='#ffffff', width=13, command=self.get_next_page)
         self.btn.place(x=370, y=550, width=150, height=50)
         self.btn.place_forget()
-        '''
-        self.btn = tk.Button(master, text=">>>", activebackground='#eeeeee', activeforeground='#000000',
-                             bg='#a0a000', fg='#ffffff', width=13, command=self.confirm_edit)
-
-        self.btn.place(x=520, y=550, width=150, height=50)
-        self.btn = tk.Button(master, text="Rollback", activebackground='#eeeeee', activeforeground='#000000',
-                             bg='#a0a000', fg='#ffffff', width=13, command=self.rollback_edit)
-        self.btn.place(x=670, y=550, width=150, height=50)
-        
-        # таблица (command=self.edit_query заменить лямбда-функцией)
-        i = 0
-        while i < self.page_size:
-            j = 0
-            while j < self.row_size:
-                if j % 2 == 0:
-                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbbbff', fg='#000000', height=2, width=13, relief=tk.RIDGE, wraplength=140, command=self.edit_query)
-                else:
-                    self.tab = tk.Button(self.master, text=self.data[i][j], activebackground='#111111', activeforeground='#ffffff', bg='#bbffbb', fg='#000000', height=2, width=13, relief=tk.RIDGE, wraplength=140, command=self.edit_query)
-                self.tab.place(x=10+(150*j), y=50+(50*i))
-                j += 1
-            i += 1
-        '''
         self.draw_page()
         self.get_page_query()
         self.refresh()
-        
-        # Tell the entry widget to watch this variable.
-        #self.entrythingy['textvariable'] = self.contents
-
-        # Define a callback for when the user hits return.
-        # It prints the current value of the variable.
         self.master.bind('<Key-F5>', self.get_page_query_bind)
         self.master.bind('<Key-F4>', self.get_prev_page_bind)
         self.master.bind('<Key-F6>', self.get_next_page_bind)
-        #self.entrythingy.bind('<Key-F1>', self.edit_query)
-        #self.entrythingy.bind('<Key-F2>', self.confirm_edit)
-        #self.entrythingy.bind('<Key-F3>', self.rollback_edit)
-        #self.entrythingy.bind('<Key-Return>', self.print_contents)
 
     def vvod_buttom(self):
         i = 0
@@ -110,16 +74,10 @@ class App(tk.Frame):
                 j += 1
             i += 1
 
-    def test(self, i, j, *args): #просто для теста
+    def test(self, i, j): #просто для теста
         if self.Flag:
             if ((self.pred[0] != i) or (self.pred[1] != j)):
-                '''
-                print("нажата ячейка " + str(i) + " " + str(j))
-                print("тут")
-                тут должна быть проверка доступности ячейки
-                '''
                 self.edit_query(i, j)
-
                 self.pred[0] = i
                 self.pred[1] = j
 
@@ -128,7 +86,6 @@ class App(tk.Frame):
 
     def send_to_master(self, query: object) -> object:
         self.queue.put(query)
-        #print('send_to_master:', query)
 
     def get_page_query_bind(self, event):
         self.get_page_query()
@@ -170,11 +127,7 @@ class App(tk.Frame):
         self.message_entry.delete(0, END)
         self.message_entry.insert(0, self.vrbl[row][col].get())
         self.message_entry.place(x=x, y=y, width=150, height=50)
-        #self.message_entry.place(x=820, y=550, width=150, height=50)
-
         self.rollback_edit()
-
-        #print(f'Time before sending: {perf_counter()}')
         self.send_to_master(['edit', self.page, row, col])
 
     def confirm_edit(self):
@@ -183,35 +136,27 @@ class App(tk.Frame):
 
         self.edited_cell = (99, 99)
         self.send_to_master(['confirm', self.cell_value])
-        #self.draw_page()
         self.refresh()
 
     def confirm_edit_bind(self, event):
         self.confirm_edit()
 
     def rollback_edit(self):
-
-        #self.edited_cell = (99, 99)
         self.send_to_master(['rollback'])
 
     def rollback_edit_bind(self, event):
-        #self.cell_color_reset(edited_cell[0], edited_cell[1])
         self.message_entry.place_forget()
         self.rollback_edit()
 
     def set_data(self, data):
         self.data = data
-        #print('gui_data = ', self.data)
-        #self.draw_page()
         self.refresh()
 
     def draw_page(self):
         start_time = perf_counter()
-        #print(f'Time before drawing: {start_time}')
         self.pred = [99,99]
         self.Flag = 0
         print('GUI got data ')
-        #print('GUI got data ', data)
         self.mass = [[tk.StringVar() for j in range(self.row_size)] for i in range(self.page_size)]
         self.tab = [[0 for j in range(self.row_size)] for i in range(self.page_size)]
         self.vrbl = [[tk.StringVar() for j in range(self.row_size)] for i in range(self.page_size)]
@@ -220,7 +165,7 @@ class App(tk.Frame):
         while i < self.page_size:
             j = 0
             while j < self.row_size:
-                self.mass[i][j].trace("w", lambda name1, name2, op, x=i, y=j: self.test(x,y,name1,name2,op))
+                self.mass[i][j].trace("w", lambda name1, name2, op, x=i, y=j: self.test(x, y))
                 j += 1
             i += 1
 
@@ -240,8 +185,6 @@ class App(tk.Frame):
                 coords = (i, j)
                 
                 if coords != self.edited_cell:
-                    #print(self.data[i][j])
-                    #self.vrbl[i][j] = tk.StringVar(self.data[i][j])
                     self.tab[i][j] = tk.Button(self.master, textvariable=self.vrbl[i][j], activebackground=cell_active_bg_color, activeforeground='#000000',
                              bg=cell_bg_color, fg=cell_fg_color, width=10, command=(lambda x=i, y=j: self.edit_query(x, y)))
                 else:
@@ -255,8 +198,6 @@ class App(tk.Frame):
                 self.message_entry.bind('<Key-Escape>', self.rollback_edit_bind)
                 self.message_entry.place(x=820, y=550, width=150, height=50)
                 self.message_entry.place_forget()
-
-
                 j += 1
             i += 1
         self.Flag = 1
@@ -265,17 +206,11 @@ class App(tk.Frame):
         print(f'Drawing time: {execution_time}')
 
     def refresh(self):
-
         i = 0
         while i < self.page_size:
             j = 0
             while j < self.page_size:
-                #self.data[i][j].set(self.mass[i][j])
-                #self.tab[i][j].set(text=self.mass[i][j])
                 self.vrbl[i][j].set(self.data[i][j])
-                #if (i, j) in self.busy_cells:
-                #    self.tab[i][j].config(bg="#aaaa22", activebackground="#bbbb33")
-                #    print('yellow colored', (i, j))
                 self.cell_color(i, j)
                 j += 1
             self.row_number[i].set((self.page-1)*self.page_size+i+1)
@@ -299,32 +234,26 @@ class App(tk.Frame):
             for cell in self.busy_cells:
                 self.cell_color(cell[0], cell[1])
 
-    #def reset_busy_cells(self,
-
     def set_row_size(self, row_size):
         self.row_size = row_size
 
     def set_modified_cell(self, coords):
         self.data[coords[0]][coords[1]] = coords[2]
         self.refresh()
-        #self.update_cell(coords)
 
     def cell_color(self, i, j):
         if i >= self.page_size or j >= self.row_size:
             return
         if (i, j) in self.busy_cells:
-            #print(f'i={i}, j={j}')
             self.tab[i][j].config(bg="#d5d522", activebackground="#dddd33")
-            #print('yellow colored', (i, j))
+
         else:
             if j % 2 == 0:
                 cell_bg_color = '#f0f0f0'
                 cell_active_bg_color = '#f5f5f5'
-                cell_fg_color = '#000000'
             else:
                 cell_bg_color = '#f9f9f9'
                 cell_active_bg_color = '#ffffff'
-                cell_fg_color = '#000000'
             self.tab[i][j].config(bg=cell_bg_color, activebackground=cell_active_bg_color)
 
     def cell_color_reset(self, i, j):
@@ -333,11 +262,9 @@ class App(tk.Frame):
         if j % 2 == 0:
             cell_bg_color = '#f0f0f0'
             cell_active_bg_color = '#f5f5f5'
-            cell_fg_color = '#000000'
         else:
             cell_bg_color = '#f9f9f9'
             cell_active_bg_color = '#ffffff'
-            cell_fg_color = '#000000'
         self.tab[i][j].config(bg=cell_bg_color, activebackground=cell_active_bg_color)
 
 
@@ -366,8 +293,6 @@ class GuiThread(Thread):
             self.app.set_busy_cells(data['edit'])
             if data['modified']:
                 self.app.set_modified_cell(data['modified'])
-
-        #print(f'{data=}')
 
     def get_query(self):
         if self.app.queue.empty():

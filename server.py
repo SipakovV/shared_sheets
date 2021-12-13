@@ -3,12 +3,8 @@ import socket
 import sys
 from threading import Thread, get_ident, enumerate
 import traceback
-import tkinter as tk
-from time import sleep
 import csv
 import pickle
-
-from gui import App
 
 
 FILENAME = 'data.csv'
@@ -29,7 +25,6 @@ row_size = 0
 
 def write_csv():
     with open(FILENAME, "w", newline='') as f:
-        #data.insert(row, some_thing)
         writer = csv.writer(f)
         writer.writerows(data)
 
@@ -83,7 +78,7 @@ def rollback_edit(conn, thread_id):
         broadcast_messages[len(broadcast_messages)] = (None, clients_pages[thread_id], row, col)
 
 
-def confirm_edit(conn, thread_id, confirmed_value):  #
+def confirm_edit(conn, thread_id, confirmed_value):
     try:
         cell_id = list(busy_cells.keys())[list(busy_cells.values()).index(thread_id)]
     except ValueError:
@@ -109,11 +104,7 @@ def check_edit(conn, thread_id, coords):  # проверяет, занята л�
 
 
 def broadcast_status(conn, page, thread_id):  # отправляет страницу всем, кто на ней находится
-
-    rows_from = (page - 1) * PAGE_SIZE + 1
-    rows_to = page * PAGE_SIZE + 1
     header = data[0]
-    table = data[rows_from:rows_to]
     modified_cell = ()
 
     if broadcast_indexes[thread_id] < len(broadcast_messages)+1:
@@ -123,8 +114,6 @@ def broadcast_status(conn, page, thread_id):  # отправляет стран�
             if message[0]:
                 modified_cell = (message[2], message[3], message[0])
                 print('CELL MODIFIED')
-
-    print('status')
 
     in_edit = []
     for key in busy_cells.keys():
@@ -209,7 +198,7 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
         rollback_edit(conn, get_ident())
 
     conn.close()
-    print('Connection ' + ip + ':' + port + " ended")
+    print('Connection ' + ip + ':' + port + " closed")
 
 
 def start_server():
@@ -227,11 +216,10 @@ def start_server():
     try:
         soc.bind(ADDRESS)
         #print('Socket bind complete')
-    except socket.error as msg:
+    except socket.error:
         print('Bind failed. Error : ' + str(sys.exc_info()))
         sys.exit()
 
-    # Start listening on socket
     soc.listen(5)
     print(f'Socket now listening at {ADDRESS[0]}:{ADDRESS[1]}')
 
@@ -243,11 +231,9 @@ def start_server():
             Thread(target=client_thread, args=(conn, ip, port), daemon=True).start()
             for thread in enumerate():
                 print(f'Hello from thread {thread}')
-
         except:
             print("Terrible error!")
             traceback.print_exc()
-    soc.close()
 
 
 if __name__ == '__main__':
