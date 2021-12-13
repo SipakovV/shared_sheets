@@ -4,12 +4,11 @@ from threading import Thread
 from time import perf_counter
 from queue import Queue
 
-
-
+MAX_BUFFER_SIZE = 4096
 
 class App(tk.Frame):
 
-    data = [["???" for y in range(10)] for x in range(10)]  #None эту переменную выводите на экран
+    data = [["???" for y in range(10)] for x in range(10)]
     busy_cells = []
 
     max_pages = 1
@@ -25,10 +24,8 @@ class App(tk.Frame):
         super().__init__(master)
         self.pack()
         self.message = StringVar()
-        self.entrythingy = tk.Entry()
 
-        
-        #заголовки
+        # заголовки
         header = ["Series_reference", "Period", "Data_value", "Suppressed", "STATUS", "UNITS", "Magnitude", "Subject", "Group", "Series_title_1"]
         i = 0
 
@@ -37,7 +34,7 @@ class App(tk.Frame):
             hdr.place(x=70+(150*i),y=20)
             i += 1
         
-        #нумерация строк
+        # нумерация строк
         self.row_number = [tk.StringVar() for j in range(self.page_size)]
         self.row_label = [None for j in range(self.page_size)]
         i = 0
@@ -74,7 +71,7 @@ class App(tk.Frame):
                 j += 1
             i += 1
 
-    def test(self, i, j): #просто для теста
+    def test(self, i, j):  # просто для теста
         if self.Flag:
             if ((self.pred[0] != i) or (self.pred[1] != j)):
                 self.edit_query(i, j)
@@ -131,6 +128,8 @@ class App(tk.Frame):
         self.send_to_master(['edit', self.page, row, col])
 
     def confirm_edit(self):
+        if len(self.message.get()) > MAX_BUFFER_SIZE:
+            print(f'Error: too many symbols in cell (max: {MAX_BUFFER_SIZE}')
         self.cell_value = self.message.get()
         self.message_entry.place_forget()
 

@@ -23,13 +23,13 @@ number_of_pages = 0
 row_size = 0
 
 
-def write_csv():
+def write_csv():  # запись таблицы в файл .csv
     with open(FILENAME, "w", newline='') as f:
         writer = csv.writer(f)
         writer.writerows(data)
 
 
-def read_csv():
+def read_csv():  # чтение таблицы из файла .csv
     with open(FILENAME, newline='') as f:
         reader = csv.reader(f)
         header_flag = True
@@ -45,7 +45,7 @@ def read_csv():
     return data
 
 
-def process_query(conn, query, thread_id):
+def process_query(conn, query, thread_id):  # обработка запроса
     if query[0] != 'status':
         print(f"Processing query {query[0]} from client {thread_id}")
     if query[0] == 'status':
@@ -65,7 +65,7 @@ def process_query(conn, query, thread_id):
         rollback_edit(conn, thread_id)
 
 
-def rollback_edit(conn, thread_id):
+def rollback_edit(conn, thread_id):  # отмена изменения клетки
     try:
         cell_id = list(busy_cells.keys())[list(busy_cells.values()).index(thread_id)]
     except:
@@ -78,7 +78,7 @@ def rollback_edit(conn, thread_id):
         broadcast_messages[len(broadcast_messages)] = (None, clients_pages[thread_id], row, col)
 
 
-def confirm_edit(conn, thread_id, confirmed_value):
+def confirm_edit(conn, thread_id, confirmed_value):  # применение изменения в клетке
     try:
         cell_id = list(busy_cells.keys())[list(busy_cells.values()).index(thread_id)]
     except ValueError:
@@ -95,7 +95,7 @@ def confirm_edit(conn, thread_id, confirmed_value):
             write_csv()
 
 
-def check_edit(conn, thread_id, coords):  # проверяет, занята ли клетка: если не занята - занимает
+def check_edit(conn, thread_id, coords):  # проверка, занята ли клетка: если не занята - занять
     print(coords)
     cell_id = row_size * PAGE_SIZE * (coords[0]-1) + row_size * coords[1] + coords[2]
     if cell_id not in busy_cells:
@@ -103,7 +103,7 @@ def check_edit(conn, thread_id, coords):  # проверяет, занята л�
         broadcast_messages[len(broadcast_messages)] = (None, coords[0], coords[1], coords[2])
 
 
-def broadcast_status(conn, page, thread_id):  # отправляет страницу всем, кто на ней находится
+def broadcast_status(conn, page, thread_id):  # отправка изменения на странице в ответ на запрос статуса
     header = data[0]
     modified_cell = ()
 
@@ -139,7 +139,7 @@ def broadcast_status(conn, page, thread_id):  # отправляет стран�
     print('Status sent')
 
 
-def send_page(conn, page):  # отправляет страницу одному клиенту в ответ на запрос
+def send_page(conn, page):  # отправка всей страницы клиенту в ответ на запрос
 
     rows_from = (page - 1) * PAGE_SIZE + 1
     rows_to = page * PAGE_SIZE + 1
@@ -170,7 +170,7 @@ def send_page(conn, page):  # отправляет страницу одному
     print('Data sent')
 
 
-def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
+def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):  # поток, обрабатывающий запросы одного клиента
 
     global number_of_pages
     pages_num = pickle.dumps([number_of_pages])
@@ -201,7 +201,7 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
     print('Connection ' + ip + ':' + port + " closed")
 
 
-def start_server():
+def start_server():  # запуск сервера
     global data
     global number_of_pages
     data = read_csv()
