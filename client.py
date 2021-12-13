@@ -89,7 +89,7 @@ def start_client():
             print('query = ', query)
             send_query(query, soc)
 
-        sleep(0.5)
+        sleep(0.1)
         send_status_query(soc)
         if not gui.is_alive():
             break

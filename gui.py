@@ -145,12 +145,14 @@ class App(tk.Frame):
         self.send_to_master(['get', self.page])
 
     def get_next_page(self):
-        self.page += 1
-        self.get_page_query()
+        if self.page < self.max_pages-1:
+            self.page += 1
+            self.get_page_query()
 
     def get_prev_page(self):
-        self.page -= 1
-        self.get_page_query()
+        if self.page > 1:
+            self.page -= 1
+            self.get_page_query()
 
     def edit_query(self, row: object, col: object) -> object:
         if (row, col) in self.busy_cells:
