@@ -97,6 +97,7 @@ class App(tk.Frame):
         self.get_prev_page()
 
     def get_page_query(self):
+        self.rollback_edit()
         self.message_entry.place_forget()
         self.message_entry.delete(0, END)
         self.send_to_master(['get', self.page])
