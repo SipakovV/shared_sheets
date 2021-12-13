@@ -136,7 +136,6 @@ def broadcast_status(conn, page, thread_id):  # отправка изменен�
 
     packed_data = pickle.dumps(data_dict)
     conn.sendall(packed_data)
-    print('Status sent')
 
 
 def send_page(conn, page):  # отправка всей страницы клиенту в ответ на запрос
@@ -167,7 +166,6 @@ def send_page(conn, page):  # отправка всей страницы кли�
 
     packed_data = pickle.dumps(data_dict)
     conn.sendall(packed_data)
-    print('Data sent')
 
 
 def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):  # поток, обрабатывающий запросы одного клиента
@@ -218,7 +216,7 @@ def start_server():  # запуск сервера
         soc.bind(ADDRESS)
         #print('Socket bind complete')
     except socket.error:
-        print('Bind failed. Error : ' + str(sys.exc_info()))
+        print('Bind failed. Error: ' + str(sys.exc_info()))
         sys.exit()
 
     soc.listen(5)
@@ -237,8 +235,8 @@ def start_server():  # запуск сервера
                 print("Terrible error!")
                 traceback.print_exc()
         except KeyboardInterrupt:
-            print("Server stopped")
-            return 
+            print("\nServer stopped")
+            return
 
 
 if __name__ == '__main__':

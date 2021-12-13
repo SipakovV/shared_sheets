@@ -63,29 +63,10 @@ class App(tk.Frame):
         self.master.bind('<Key-F4>', self.get_prev_page_bind)
         self.master.bind('<Key-F6>', self.get_next_page_bind)
 
-    def vvod_buttom(self):
-        i = 0
-        while i < self.page_size:
-            j = 0
-            while j < self.row_size:
-                self.data[i][j] = self.mass[i][j].get()
-                j += 1
-            i += 1
-
-    def test(self, i, j):  # просто для теста
-        if self.Flag:
-            if ((self.pred[0] != i) or (self.pred[1] != j)):
-                self.edit_query(i, j)
-                self.pred[0] = i
-                self.pred[1] = j
-
-    def print_contents(self, event):
-        print('The current entry content is:', self.contents.get())
-
     def send_to_master(self, query: object) -> object:
         self.queue.put(query)
 
-    def get_page_query_bind(self, event):
+    def get_page_query_bind(self, event):  #
         self.get_page_query()
 
     def get_next_page_bind(self, event):

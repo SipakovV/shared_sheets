@@ -41,25 +41,25 @@ def send_query(query, soc):  # отправка запроса серверу
     soc.send(packed_query)
 
 
-def send_status_query(soc):  #
+def send_status_query(soc):  # отправка запроса статуса серверу
     query = ['status']
     packed_query = pickle.dumps(query)
     soc.send(packed_query)
 
 
-def get_data_from_server(soc):
-    result_bytes = soc.recv(4096)  # the number means how the response can be in bytes
+def get_data_from_server(soc):  # принятие пакета от сервера
+    result_bytes = soc.recv(4096)
     result_data = pickle.loads(result_bytes)
     return result_data
 
 
-def get_number_of_pages(soc, gui):
+def get_number_of_pages(soc, gui):  # принятие количества страниц
     pages_num_bytes = soc.recv(40)
     pages_num = pickle.loads(pages_num_bytes)[0]
     gui.set_number_of_pages(pages_num)
 
 
-def start_client():
+def start_client():  # запуск программы
     try:
         gui = GuiThread()
         gui.setDaemon(True)
