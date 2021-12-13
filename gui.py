@@ -128,8 +128,9 @@ class App(tk.Frame):
         self.send_to_master(['edit', self.page, row, col])
 
     def confirm_edit(self):
-        if len(self.message.get()) > MAX_BUFFER_SIZE:
+        if len(self.message.get()) >= MAX_BUFFER_SIZE:
             print(f'Error: too many symbols in cell (max: {MAX_BUFFER_SIZE}')
+            return
         self.cell_value = self.message.get()
         self.message_entry.place_forget()
 
