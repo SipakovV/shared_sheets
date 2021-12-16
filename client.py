@@ -10,13 +10,14 @@ from gui import App, GuiThread
 
 SERVER_ADDRESS = ("127.0.0.1", 12345)
 
+MAX_BUFFER_SIZE = 4096
 data = []
 
 queue_to_gui = Queue()
 queue_from_gui = Queue()
 
 
-def listening_thread(soc, gui, MAX_BUFFER_SIZE = 4096):  # поток, обрабатывающий пакеты с сервера
+def listening_thread(soc, gui):  # поток, обрабатывающий пакеты с сервера
     while True:
         try:
             result_data = get_data_from_server(soc)
@@ -48,7 +49,7 @@ def send_status_query(soc):  # отправка запроса статуса с
 
 
 def get_data_from_server(soc):  # принятие пакета от сервера
-    result_bytes = soc.recv(4096)
+    result_bytes = soc.recv(MAX_BUFFER_SIZE)
     result_data = pickle.loads(result_bytes)
     return result_data
 

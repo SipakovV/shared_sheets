@@ -113,7 +113,6 @@ def broadcast_status(conn, page, thread_id):  # отправка изменен�
         if message[1] == page:
             if message[0]:
                 modified_cell = (message[2], message[3], message[0])
-                print('CELL MODIFIED')
 
     in_edit = []
     for key in busy_cells.keys():
@@ -168,7 +167,7 @@ def send_page(conn, page):  # отправка всей страницы кли�
     conn.sendall(packed_data)
 
 
-def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):  # поток, обрабатывающий запросы одного клиента
+def client_thread(conn, ip, port):  # поток, обрабатывающий запросы одного клиента
 
     global number_of_pages
     pages_num = pickle.dumps([number_of_pages])
