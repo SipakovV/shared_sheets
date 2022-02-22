@@ -5,6 +5,10 @@ from threading import Thread, get_ident, enumerate
 import traceback
 import csv
 import pickle
+import logging
+
+logging.basicConfig(filename='debug.log', level=logging.DEBUG)
+
 
 
 FILENAME = 'data.csv'
@@ -47,7 +51,7 @@ def read_csv():  # чтение таблицы из файла .csv
 
 def process_query(conn, query, thread_id):  # обработка запроса
     if query[0] != 'status':
-        print(f"Processing query {query[0]} from client {thread_id}")
+        logging.debug(f"Processing query {query[0]} from client {thread_id}")
     if query[0] == 'status':
         if len(broadcast_messages) > broadcast_indexes[thread_id]:
             broadcast_status(conn, clients_pages[thread_id], thread_id)
@@ -96,7 +100,6 @@ def confirm_edit(conn, thread_id, confirmed_value):  # применение из
 
 
 def check_edit(conn, thread_id, coords):  # проверка, занята ли клетка: если не занята - занять
-    print(coords)
     cell_id = row_size * PAGE_SIZE * (coords[0]-1) + row_size * coords[1] + coords[2]
     if cell_id not in busy_cells:
         busy_cells[cell_id] = thread_id
@@ -184,7 +187,7 @@ def client_thread(conn, ip, port):  # поток, обрабатывающий �
 
             siz = sys.getsizeof(input_from_client_bytes)
             if siz >= MAX_BUFFER_SIZE:
-                print("The length of input is probably too long: {}".format(siz))
+                logging.warning("The length of input is probably too long: {}".format(siz))
 
             input_from_client = pickle.loads(input_from_client_bytes)
             process_query(conn, input_from_client, get_ident())
@@ -196,7 +199,7 @@ def client_thread(conn, ip, port):  # поток, обрабатывающий �
         rollback_edit(conn, get_ident())
 
     conn.close()
-    print('Connection ' + ip + ':' + port + " closed")
+    logging.info('Connection ' + ip + ':' + port + " closed")
 
 
 def start_server():  # запуск сервера
@@ -205,35 +208,38 @@ def start_server():  # запуск сервера
     data = read_csv()
     number_of_pages = len(data) // PAGE_SIZE + 1
 
-    print(f'Csv file read (pages: {number_of_pages}, columns: {row_size})')
+    print('Server started')
+    logging.info(f'Csv file read (pages: {number_of_pages}, columns: {row_size})')
 
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    print('Socket created')
+    logging.info('Socket created')
 
     try:
         soc.bind(ADDRESS)
         #print('Socket bind complete')
     except socket.error:
-        print('Bind failed. Error: ' + str(sys.exc_info()))
+        logging.error('Bind failed. Error: ' + str(sys.exc_info()))
         sys.exit()
 
     soc.listen(5)
-    print(f'Socket now listening at {ADDRESS[0]}:{ADDRESS[1]}')
+    logging.info(f'Socket now listening at {ADDRESS[0]}:{ADDRESS[1]}')
 
     while True:
         try:
             conn, addr = soc.accept()
             ip, port = str(addr[0]), str(addr[1])
+            logging.info('Accepting connection from ' + ip + ':' + port)
             print('Accepting connection from ' + ip + ':' + port)
             try:
                 Thread(target=client_thread, args=(conn, ip, port), daemon=True).start()
                 for thread in enumerate():
-                    print(f'Hello from thread {thread}')
+                    logging.debug(f'Hello from thread {thread}')
             except:
                 print("Terrible error!")
                 traceback.print_exc()
         except KeyboardInterrupt:
+            logging.info("Server stopped")
             print("\nServer stopped")
             return
 
