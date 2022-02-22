@@ -1,7 +1,10 @@
-/__pycache__
-/.idea
-/old
+/__pycache__/
+/.idea/
+/old/
+/.venv/
+
 .~lock.*
 test.py
 data.csv
 *.csv
+server_test.py
