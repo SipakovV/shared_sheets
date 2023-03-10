@@ -13,9 +13,6 @@ SERVER_ADDRESS = ("127.0.0.1", 12345)
 MAX_BUFFER_SIZE = 4096
 data = []
 
-queue_to_gui = Queue()
-queue_from_gui = Queue()
-
 
 def listening_thread(soc, gui):  # поток, обрабатывающий пакеты с сервера
     while True:
