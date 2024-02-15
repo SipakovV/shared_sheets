@@ -252,8 +252,8 @@ class App(tk.Frame):
 
 
 class GuiThread(Thread):
-
-    def __init__(self):
+    def __init__(self, window_title):
+        self.window_title = window_title
         Thread.__init__(self)
 
     def run(self):
@@ -269,7 +269,7 @@ class GuiThread(Thread):
         if data['type'] == 'full':
             self.app.set_header(data['header'])
             self.app.set_busy_cells(data['edit'])
-            self.app.master.title(data['filename'])
+            self.app.master.title(data['filename'] + ' - ' + self.window_title)
             self.app.set_row_size(data['row_size'])
             self.app.set_data(data['table'])
         elif data['type'] == 'part':

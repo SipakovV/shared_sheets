@@ -58,8 +58,10 @@ def get_number_of_pages(soc, gui):  # принятие количества ст
 
 
 def start_client():  # запуск программы
+    window_title = input('Client name:')
+
     try:
-        gui = GuiThread()
+        gui = GuiThread(window_title)
         gui.setDaemon(True)
         gui.start()
     except:
